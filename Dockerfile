@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM pangeo/pangeo-notebook:2022.07.13
 # install the notebook package
 RUN pip install --no-cache --upgrade pip && \
     pip install --no-cache notebook jupyterlab
