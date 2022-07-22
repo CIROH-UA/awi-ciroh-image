@@ -19,19 +19,6 @@ RUN pip install --no-cache --upgrade pip && \
         #       conda-forge. We have also installed TurboVNC for performance
         #       I think, and also various apt packages to get a desktop UI.
 
-# create user with a home directory
-ARG NB_USER
-ARG NB_UID
-ENV USER ${NB_USER}
-ENV HOME /home/${NB_USER}
-
-RUN adduser --disabled-password \
-    --gecos "Default user" \
-    --uid ${NB_UID} \
-    ${NB_USER}
-WORKDIR ${HOME}
-USER ${USER}
-
 # Install TurboVNC (https://github.com/TurboVNC/turbovnc)
 ARG TURBOVNC_VERSION=2.2.6
 RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}/turbovnc_${TURBOVNC_VERSION}_amd64.deb/download" -O turbovnc.deb \
@@ -45,3 +32,16 @@ RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}
 # Mamba is available in the base image via:
 # https://github.com/pangeo-data/pangeo-docker-images/blob/114c498cc9335b068120f673dd90b6b1cac87187/base-image/Dockerfile#L65-L75
 RUN mamba install -n ${CONDA_ENV} -y websockify
+
+# create user with a home directory
+ARG NB_USER
+ARG NB_UID
+ENV USER ${NB_USER}
+ENV HOME /home/${NB_USER}
+
+RUN adduser --disabled-password \
+    --gecos "Default user" \
+    --uid ${NB_UID} \
+    ${NB_USER}
+WORKDIR ${HOME}
+USER ${USER}
