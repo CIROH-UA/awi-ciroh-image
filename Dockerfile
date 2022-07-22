@@ -1,3 +1,8 @@
+# This Dockerfile aims to provide a Pangeo-style image with the VNC/Linux Desktop feature
+# It was constructed by following the instructions and copying code snippets laid out
+# and linked from here:
+# https://github.com/2i2c-org/infrastructure/issues/1444#issuecomment-1187405324
+
 FROM pangeo/pangeo-notebook:2022.07.13
 # install the notebook package
 RUN pip install --no-cache --upgrade pip && \
