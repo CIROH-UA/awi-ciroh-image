@@ -15,3 +15,12 @@ RUN adduser --disabled-password \
     ${NB_USER}
 WORKDIR ${HOME}
 USER ${USER}
+
+# Install TurboVNC (https://github.com/TurboVNC/turbovnc)
+ARG TURBOVNC_VERSION=2.2.6
+RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}/turbovnc_${TURBOVNC_VERSION}_amd64.deb/download" -O turbovnc.deb \
+ && apt-get install -y ./turbovnc.deb > /dev/null \
+    # remove light-locker to prevent screen lock
+ && apt-get remove -y light-locker > /dev/null \
+ && rm ./turbovnc.deb \
+ && ln -s /opt/TurboVNC/bin/* /usr/local/bin/
