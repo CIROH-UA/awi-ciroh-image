@@ -40,3 +40,8 @@ RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}
  && apt-get remove -y light-locker > /dev/null \
  && rm ./turbovnc.deb \
  && ln -s /opt/TurboVNC/bin/* /usr/local/bin/
+
+# Install websockify via mamba
+# Mamba is available in the base image via:
+# https://github.com/pangeo-data/pangeo-docker-images/blob/114c498cc9335b068120f673dd90b6b1cac87187/base-image/Dockerfile#L65-L75
+RUN mamba install -n ${CONDA_ENV} -y websockify
