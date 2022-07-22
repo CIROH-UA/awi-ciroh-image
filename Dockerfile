@@ -7,7 +7,7 @@ FROM pangeo/pangeo-notebook:2022.07.13
 # install the notebook package
 RUN pip install --no-cache --upgrade pip && \
     pip install --no-cache notebook jupyterlab \
-    https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip \
+    https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
         # jupyter-remote-desktop-proxy enables us to visit the /desktop path
         # just like we visit the /lab path. Visiting /desktop provides us
         # with an actual remote desktop experience.
