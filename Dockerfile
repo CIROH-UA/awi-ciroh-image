@@ -1,7 +1,18 @@
 FROM pangeo/pangeo-notebook:2022.07.13
 # install the notebook package
 RUN pip install --no-cache --upgrade pip && \
-    pip install --no-cache notebook jupyterlab
+    pip install --no-cache notebook jupyterlab \
+    https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip \
+        # jupyter-remote-desktop-proxy enables us to visit the /desktop path
+        # just like we visit the /lab path. Visiting /desktop provides us
+        # with an actual remote desktop experience.
+        #
+        # NOTE: This package is not available on conda-forge, but available
+        #       on PyPI as jupyter-desktop-server I think but maybe not.
+        #
+        # NOTE: This install requires websockify to be installed via
+        #       conda-forge. We have also installed TurboVNC for performance
+        #       I think, and also various apt packages to get a desktop UI.
 
 # create user with a home directory
 ARG NB_USER
