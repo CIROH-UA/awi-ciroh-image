@@ -30,3 +30,5 @@ RUN mamba install -n ${CONDA_ENV} -y websockify
 RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
  && pip install --no-cache-dir \
         https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
+
+USER ${NB_USER}
