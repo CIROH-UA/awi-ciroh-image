@@ -25,9 +25,8 @@ RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}
  && ln -s /opt/TurboVNC/bin/* /usr/local/bin/ \
  && rm -rf /var/lib/apt/lists/*
 
-USER ${NB_USER}
+RUN mamba install -n ${CONDA_ENV} -y websockify
 
-COPY environment.yml /tmp/
-RUN mamba env update --name ${CONDA_ENV} -f environment.yml
-# Remove nb_conda_kernels from the env for now
-RUN mamba remove -n ${CONDA_ENV} nb_conda_kernels
+RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
+ && pip install --no-cache-dir \
+        https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
