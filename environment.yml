@@ -1,9 +1,17 @@
-# This is the standard conda configuration file. Use this file to list
-# the conda packages that you need installed in your environment.
+# Environment we need *on top* of base PANGEO stack
+# Get list of pangeo packages from https://github.com/pangeo-data/pangeo-docker-images/blob/master/pangeo-notebook/packages.txt
+# BUT REMEMBER TO PICK THE HASH THAT CORRESPONDS TO OUR BASE IMAGE
 channels:
   - conda-forge
 
 dependencies:
-  - jupyter_contrib_nbextensions==0.5.1
-  # Add other packages here
-  # -
+  # Packages required for image
+  - pip
+
+  # Packages required by AWI-CIROH
+  - websockify
+  - pip:
+      # jupyter-remote-desktop-proxy enables us to visit the /desktop path
+      # just like we visit the /lab path. Visiting /desktop provides us
+      # with an actual remote desktop experience.
+      - https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
