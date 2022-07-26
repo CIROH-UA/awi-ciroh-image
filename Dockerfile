@@ -14,6 +14,18 @@ RUN apt-get update -qq --yes > /dev/null && \
     apt-get install --yes -qq gnupg2 > /dev/null && \
     rm -rf /var/lib/apt/lists/*
 
+# Add potentially missing(?) packages
+RUN apt-get -y update \
+ && apt-get install -y dbus-x11 \
+   firefox \
+   xfce4 \
+   xfce4-panel \
+   xfce4-session \
+   xfce4-settings \
+   xorg \
+   xubuntu-icon-theme \
+ && rm -rf /var/lib/apt/lists/*
+
 # Install TurboVNC (https://github.com/TurboVNC/turbovnc)
 ARG TURBOVNC_VERSION=2.2.6
 RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}/turbovnc_${TURBOVNC_VERSION}_amd64.deb/download" -O turbovnc.deb \
