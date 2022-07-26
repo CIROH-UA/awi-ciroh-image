@@ -14,7 +14,6 @@ RUN apt-get update -qq --yes > /dev/null && \
     apt-get install --yes -qq gnupg2 > /dev/null && \
     rm -rf /var/lib/apt/lists/*
 
-# Add potentially missing(?) packages
 RUN apt-get -y update \
  && apt-get install -y dbus-x11 \
    firefox \
