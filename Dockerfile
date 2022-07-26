@@ -14,6 +14,17 @@ RUN apt-get update -qq --yes > /dev/null && \
     apt-get install --yes -qq gnupg2 > /dev/null && \
     rm -rf /var/lib/apt/lists/*
 
+RUN apt-get -y update \
+ && apt-get install -y dbus-x11 \
+   firefox \
+   xfce4 \
+   xfce4-panel \
+   xfce4-session \
+   xfce4-settings \
+   xorg \
+   xubuntu-icon-theme \
+ && rm -rf /var/lib/apt/lists/*
+
 # Install TurboVNC (https://github.com/TurboVNC/turbovnc)
 ARG TURBOVNC_VERSION=2.2.6
 RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}/turbovnc_${TURBOVNC_VERSION}_amd64.deb/download" -O turbovnc.deb \
@@ -25,9 +36,10 @@ RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}
  && ln -s /opt/TurboVNC/bin/* /usr/local/bin/ \
  && rm -rf /var/lib/apt/lists/*
 
-USER ${NB_USER}
+RUN mamba install -n ${CONDA_ENV} -y websockify
 
-COPY environment.yml /tmp/
-RUN mamba env update --name ${CONDA_ENV} -f environment.yml
-# Remove nb_conda_kernels from the env for now
-RUN mamba remove -n ${CONDA_ENV} nb_conda_kernels
+RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
+ && pip install --no-cache-dir \
+        https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
+
+USER ${NB_USER}
