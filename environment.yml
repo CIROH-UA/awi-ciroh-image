@@ -4,6 +4,7 @@ channels:
   - conda-forge
 
 dependencies:
+  - pip
   # Add other packages here
   - pip:
     - jupyterlab_vim
