@@ -42,8 +42,8 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
  && pip install --no-cache-dir \
         https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
 
-USER ${NB_USER}
-
 COPY environment.yml /tmp/
 
 RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yml
+
+USER ${NB_USER}
