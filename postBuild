@@ -4,3 +4,4 @@ set -euo pipefail
 # Activate the extension
 #jupyter nbextension enable vim_binding/vim_binding
 jupyter labextension install jupyterlab_vim
+jupyter labextension disable jupyterlab_vim
