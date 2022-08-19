@@ -1,11 +1,7 @@
 name: Test container image build
 
-# on:
-#   pull_request:
 on:
-  push:
-    branches:
-      - main
+  pull_request:
 
 jobs:
   test-build:
