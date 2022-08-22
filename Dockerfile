@@ -44,9 +44,6 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
 
 COPY environment.yml /tmp/
 
-
-COPY ./plugin.jupyterlab-settings /home/user/.jupyter/lab/user-settings/@jupyterlab/plugin.jupyterlab-settings/plugin.jupyterlab-settings
-
 RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yml
 
 USER ${NB_USER}
