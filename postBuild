@@ -4,5 +4,5 @@ set -euo pipefail
 # Activate the extension
 jupyter labextension install jupyterlab_vim
 # copy custom Jupyter Lab settings
-cp ./plugin.jupyterlab-settings /home/user/.jupyter/lab/user-settings/@jupyterlab/plugin.jupyterlab-settings/plugin.jupyterlab-settings
+cp /tmp/plugin.jupyterlab-settings /home/user/.jupyter/lab/user-settings/@jupyterlab/plugin.jupyterlab-settings/plugin.jupyterlab-settings
 

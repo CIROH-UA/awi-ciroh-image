@@ -43,6 +43,7 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
         https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
 
 COPY environment.yml /tmp/
+COPY plugin.jupyterlab-settings /tmp/
 
 RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yml
 
