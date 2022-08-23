@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Activate the extension
-jupyter labextension install jupyterlab_vim
+pip install install jupyterlab_vim
 # copy custom Jupyter Lab settings
 cd /home/jovyan/.jupyter/lab/user-settings/@axlair/jupyterlab_vim
 sed -i 's/"enabled": true/"enabled": false/g' plugin.jupyterlab-settings

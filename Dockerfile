@@ -42,8 +42,12 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
  && pip install --no-cache-dir \
         https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
 
-COPY environment.yml /tmp/
+#COPY environment.yml /tmp/
 
-RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yml
+#RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yml
+
+RUN pip install jupyterlab_vim
+RUN cd /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim
+RUN sed -i 's/\"default\": true/\"default\": false/g' plugin.json
 
 USER ${NB_USER}
