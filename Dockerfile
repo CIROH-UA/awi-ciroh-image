@@ -45,8 +45,7 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
 RUN pip install jupyterlab_vim
 
 # Update custom Jupyter Lab settings
-RUN cd /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim
-RUN sed -i 's/\"default\": true/\"default\": false/g' plugin.json
+RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
 
 #COPY environment.yml /tmp/
 
