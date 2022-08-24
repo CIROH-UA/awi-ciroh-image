@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-pip install jupyterlab_vim
+jupyter labextension install @axlair/jupyterlab_vim
+
 # Update custom Jupyter Lab settings
-cd /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim
-sed -i 's/\"default\": true/\"default\": false/g' plugin.json
+cd /home/jovyan/.jupyter/lab/user-settings/@axlair/jupyterlab_vim
+sed -i 's/"enabled": true/"enabled": false/g' plugin.jupyterlab-settings
