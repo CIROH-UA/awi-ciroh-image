@@ -44,8 +44,6 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
 
 COPY environment.yml /tmp/
 
-RUN pip install jupyterlab_vim
-
 RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yml
 
 USER ${NB_USER}
