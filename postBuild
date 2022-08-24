@@ -2,6 +2,7 @@
 set -euo pipefail
 
 jupyter labextension install @axlair/jupyterlab_vim
+jupyter labextension enable @axlair/jupyterlab_vim
 
 # Update custom Jupyter Lab settings
 cd /home/jovyan/.jupyter/lab/user-settings/@axlair/jupyterlab_vim
