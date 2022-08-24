@@ -47,8 +47,4 @@ RUN pip install jupyterlab_vim
 # Update custom Jupyter Lab settings
 RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
 
-#COPY environment.yml /tmp/
-
-#RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yml
-
 USER ${NB_USER}
