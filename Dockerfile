@@ -42,7 +42,14 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
  && pip install --no-cache-dir \
         https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
 
-RUN pip install jupyterlab_vim gcc-gfortran make
+#Install jupyterlab_vim
+RUN pip install jupyterlab_vim
+
+#gfortran support
+RUN apt-get update
+RUN apt-get install -yq make cmake gfortran libcoarrays-dev libopenmpi-dev  && \
+    apt-get clean -q
+RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
 # Update custom Jupyter Lab settings
 RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
