@@ -47,7 +47,7 @@ RUN pip install jupyterlab_vim
 
 #gfortran support
 RUN apt-get update
-RUN apt-get install -yq make cmake gfortran libcoarrays-dev libopenmpi-dev  && \
+RUN apt-get install -yq make cmake gfortran libcoarrays-dev libopenmpi-dev build-essential && \
     apt-get clean -q
 RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
