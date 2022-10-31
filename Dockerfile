@@ -42,7 +42,7 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
  && pip install --no-cache-dir \
         https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
 
-RUN pip install jupyterlab_vim gcc-gfortran make
+RUN pip install jupyterlab_vim
 
 # TO download the folder/files:
 RUN pip install jupyter-tree-download
