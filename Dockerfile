@@ -44,6 +44,8 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
 
 RUN pip install jupyterlab_vim gcc-gfortran make
 
+# TO download the folder/files:
+RUN pip install jupyter-tree-download
 # Update custom Jupyter Lab settings
 RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
 
