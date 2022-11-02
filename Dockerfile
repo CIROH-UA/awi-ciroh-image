@@ -47,6 +47,10 @@ RUN pip install jupyterlab_vim
 
 # TO download the folder/files:
 RUN pip install jupyter-tree-download
+
+#Gsutil and gcloud for Cloud storage
+RUN pip install gsutil gcloud
+
 # Update custom Jupyter Lab settings
 RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
 
