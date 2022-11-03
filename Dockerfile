@@ -48,8 +48,14 @@ RUN pip install jupyterlab_vim
 # TO download the folder/files:
 RUN pip install jupyter-tree-download
 
-#Gsutil and gcloud for Cloud storage
-RUN pip install gsutil gcloud
+# Install Google Cloud SDK (gcloud, gsutil)
+
+RUN apt-get update && \
+    apt-get install -y curl gnupg && \
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
+    apt-get update -y && \
+    apt-get install google-cloud-sdk -y
 
 # Update custom Jupyter Lab settings
 RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
