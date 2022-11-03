@@ -49,7 +49,7 @@ RUN pip install jupyterlab_vim
 RUN pip install jupyter-tree-download
 
 # Gsutil and gcloud for Cloud storage
-RUN pip install gsutil gcloud
+#RUN pip install gsutil gcloud
 
 # Google SDK
 RUN apt-get update && \
