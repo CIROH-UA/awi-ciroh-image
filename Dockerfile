@@ -48,10 +48,7 @@ RUN pip install jupyterlab_vim
 # TO download the folder/files:
 RUN pip install jupyter-tree-download
 
-# Gsutil and gcloud for Cloud storage
-#RUN pip install gsutil gcloud
-
-# Google SDK
+# Install Google Cloud SDK (gcloud, gsutil)
 RUN apt-get update && \
     apt-get install -y curl gnupg && \
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
