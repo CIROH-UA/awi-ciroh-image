@@ -56,6 +56,12 @@ RUN apt-get update && \
     apt-get update -y && \
     apt-get install google-cloud-sdk -y
 
+# Gfortran support
+RUN apt-get update
+RUN apt-get install -yq make cmake gfortran libcoarrays-dev libopenmpi-dev build-essential && \
+    apt-get clean -q
+RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
+
 # Update custom Jupyter Lab settings
 RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
 
