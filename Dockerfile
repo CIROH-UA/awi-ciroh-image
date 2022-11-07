@@ -58,7 +58,7 @@ RUN apt-get update && \
 
 # Gfortran support
 RUN apt-get update
-RUN apt-get install -yq make cmake gfortran gcc-multilib libcoarrays-dev libopenmpi-dev build-essential && \
+RUN apt-get install -yq make cmake gfortran gcc-multilib libnetcdff-dev libcoarrays-dev libopenmpi-dev build-essential && \
     apt-get clean -q
 RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
