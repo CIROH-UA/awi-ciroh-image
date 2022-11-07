@@ -57,8 +57,8 @@ RUN apt-get update && \
     apt-get install google-cloud-sdk -y
 
 # Gfortran support
-RUN apt-get update
-RUN apt-get install -yq make cmake gfortran gcc-multilib libnetcdff-dev libcoarrays-dev libopenmpi-dev build-essential && \
+RUN apt-get update && \
+    apt-get install -yq python3.9 python3-pip python3-wheel make cmake gfortran gcc-multilib libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
     apt-get clean -q
 RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
