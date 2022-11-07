@@ -42,10 +42,21 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
  && pip install --no-cache-dir \
         https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
 
-#Install jupyterlab_vim
+# Install jupyterlab_vim extension
 RUN pip install jupyterlab_vim
 
-#gfortran support
+# TO download the folder/files:
+RUN pip install jupyter-tree-download
+
+# Install Google Cloud SDK (gcloud, gsutil)
+RUN apt-get update && \
+    apt-get install -y curl gnupg && \
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
+    apt-get update -y && \
+    apt-get install google-cloud-sdk -y
+
+# Gfortran support
 RUN apt-get update
 RUN apt-get install -yq make cmake gfortran libcoarrays-dev libopenmpi-dev build-essential && \
     apt-get clean -q
