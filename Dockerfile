@@ -64,8 +64,9 @@ RUN apt-get update && \
 RUN apt-get update && \
     apt-get install -yq make cmake gfortran gcc-multilib libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
     apt-get clean -q
-RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
-COPY environment.yml /tmp/
+
+COPY environment.yaml /tmp/
 RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yaml
+RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
 USER ${NB_USER}
