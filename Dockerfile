@@ -66,6 +66,6 @@ RUN apt-get update && \
     apt-get clean -q
 RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 COPY environment.yml /tmp/
-RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yml
+RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yaml
 
 USER ${NB_USER}
