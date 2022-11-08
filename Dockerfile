@@ -44,8 +44,11 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
 
 # Install jupyterlab_vim extension
 RUN pip install jupyterlab_vim
+# Update custom Jupyter Lab settings
+RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
 
-# TO download the folder/files:
+
+# To download the folder/files:
 RUN pip install jupyter-tree-download
 
 # Install Google Cloud SDK (gcloud, gsutil)
@@ -57,12 +60,12 @@ RUN apt-get update && \
     apt-get install google-cloud-sdk -y
 
 # Gfortran support
+#RUN conda install python=3.10
 RUN apt-get update && \
-    apt-get install -yq python3.10 python3-pip python3-wheel make cmake gfortran gcc-multilib libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
+    apt-get install -yq make cmake gfortran gcc-multilib libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
     apt-get clean -q
-#RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
-
-# Update custom Jupyter Lab settings
-RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
+RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
+COPY environment.yml /tmp/
+RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yml
 
 USER ${NB_USER}
