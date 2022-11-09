@@ -60,13 +60,12 @@ RUN apt-get update && \
     apt-get install google-cloud-sdk -y
 
 # Gfortran support
-#RUN conda install python=3.10
 RUN apt-get update && \
     apt-get install -yq make cmake gfortran gcc-multilib libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
     apt-get clean -q
 
 COPY environment.yaml /tmp/
 RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yaml
-RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
+#RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
 USER ${NB_USER}
