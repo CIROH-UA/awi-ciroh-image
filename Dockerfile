@@ -47,7 +47,7 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
 #RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yaml
 
 RUN apt-get update && \
-    apt-get install -yq make cmake gfortran gcc-multilib glibc-static libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
+    apt-get install -yq make cmake gfortran gcc-multilib glibc-source libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
     apt-get clean -q
 RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
