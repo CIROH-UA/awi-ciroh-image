@@ -42,6 +42,16 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
  && pip install --no-cache-dir \
         https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
 
+# Gfortran support
+COPY environment.yaml /tmp/
+RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yaml
+
+RUN apt-get update && \
+    apt-get install -yq make cmake gfortran gcc-multilib libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
+    apt-get clean -q
+#RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
+
+
 # Install jupyterlab_vim extension
 RUN pip install jupyterlab_vim
 # Update custom Jupyter Lab settings
@@ -58,14 +68,5 @@ RUN apt-get update && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
     apt-get update -y && \
     apt-get install google-cloud-sdk -y
-
-# Gfortran support
-RUN apt-get update && \
-    apt-get install -yq make cmake gfortran gcc-multilib libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
-    apt-get clean -q
-
-COPY environment.yaml /tmp/
-RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yaml
-#RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
 USER ${NB_USER}
