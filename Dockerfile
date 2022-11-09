@@ -43,13 +43,13 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
         https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
 
 # Gfortran support
-COPY environment.yaml /tmp/
-RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yaml
+#COPY environment.yaml /tmp/
+#RUN mamba env update --name ${CONDA_ENV} -f /tmp/environment.yaml
 
 RUN apt-get update && \
-    apt-get install -yq make cmake gfortran gcc-multilib libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
+    apt-get install -yq make cmake gfortran gcc-multilib glibc-static libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
     apt-get clean -q
-#RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
+RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
 
 # Install jupyterlab_vim extension
