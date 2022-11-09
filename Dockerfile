@@ -48,7 +48,7 @@ RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
 
 RUN apt-get update && \
     apt-get install -yq make cmake gfortran gcc-multilib glibc-source libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
-    apt-get install libgl-dev libglu-dev libglib2.0-dev libsm-dev libxrender-dev libfontconfig1-dev libxext-dev && \
+    apt-get install -yq libgl-dev libglu-dev libglib2.0-dev libsm-dev libxrender-dev libfontconfig1-dev libxext-dev && \
     apt-get clean -q
 RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
