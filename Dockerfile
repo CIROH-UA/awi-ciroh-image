@@ -56,6 +56,8 @@ RUN apt-get update && \
     apt-get update -y && \
     apt-get install google-cloud-sdk -y
 
+RUN pip install spatialpandas easydev colormap colorcet duckdb dask_geopandas nb_black
+
 # Gfortran support
 #RUN apt-get update && \
 #    apt-get install -yq python3.9 python3-pip python3-wheel make cmake gfortran gcc-multilib libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
