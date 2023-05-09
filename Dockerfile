@@ -56,8 +56,8 @@ RUN apt-get update && \
     apt-get update -y && \
     apt-get install google-cloud-sdk -y
 
-# Install packages: spatialpandas, easydev, colormap, colorcet, duckdb, dask_geopandas, nb_black, hydrotools
-RUN pip install spatialpandas easydev colormap colorcet duckdb dask_geopandas nb_black hydrotools
+# Install packages: spatialpandas, easydev, colormap, colorcet, duckdb, dask_geopandas, nb_black, hydrotools, sidecar
+RUN pip install spatialpandas easydev colormap colorcet duckdb dask_geopandas nb_black hydrotools sidecar
 
 # Gfortran support
 #RUN apt-get update && \
