@@ -65,6 +65,11 @@ RUN pip install spatialpandas easydev colormap colorcet duckdb dask_geopandas nb
 #    apt-get clean -q
 #RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
+# Install nbfetch for hydroshare
+RUN pip install -U --no-cache-dir --upgrade-strategy only-if-needed git+https://github.com/hydroshare/nbfetch.git@master
+# enable jupyter_server extension
+RUN jupyter server extension enable --py nbfetch --sys-prefix
+
 # Update custom Jupyter Lab settings
 RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
 
