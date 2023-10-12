@@ -70,6 +70,9 @@ RUN pip install -U --no-cache-dir --upgrade-strategy only-if-needed git+https://
 # enable jupyter_server extension
 RUN jupyter server extension enable --py nbfetch --sys-prefix
 
+# Install google cloud bigquery
+RUN pip install google-cloud-bigquery
+
 # Update custom Jupyter Lab settings
 RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
 
