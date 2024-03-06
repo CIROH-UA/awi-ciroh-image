@@ -3,7 +3,7 @@
 # and linked from here:
 # https://github.com/2i2c-org/infrastructure/issues/1444#issuecomment-1187405324
 
-FROM pangeo/pangeo-notebook:2023.09.11
+FROM pangeo/pangeo-notebook:2023.01.13
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive
@@ -42,7 +42,9 @@ RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}
 
 RUN mamba install -n ${CONDA_ENV} -y websockify
 
+# Install jupyter-remote-desktop-proxy with compatible npm version
 RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
+ && npm install -g npm@7.24.0 \
  && pip install --no-cache-dir \
         https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
 
@@ -60,8 +62,11 @@ RUN apt-get update && \
     apt-get update -y && \
     apt-get install google-cloud-sdk -y
 
-# Install packages: spatialpandas, easydev, colormap, colorcet, duckdb, dask_geopandas, nb_black, hydrotools, sidecar
-RUN pip install spatialpandas easydev colormap colorcet duckdb dask_geopandas nb_black hydrotools sidecar
+# Install packages: spatialpandas, easydev, colormap, colorcet, duckdb, dask_geopandas, hydrotools, sidecar
+RUN pip install spatialpandas easydev colormap colorcet duckdb dask_geopandas hydrotools sidecar
+
+# Install nb_black separately to address metadata generation issue
+RUN pip install nb_black==1.0.7
 
 # Gfortran support
 #RUN apt-get update && \
