@@ -3,7 +3,7 @@
 # and linked from here:
 # https://github.com/2i2c-org/infrastructure/issues/1444#issuecomment-1187405324
 
-FROM pangeo/pangeo-notebook:2023.01.13
+FROM pangeo/pangeo-notebook:2023.09.11
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive
@@ -13,6 +13,11 @@ ENV PATH ${NB_PYTHON_PREFIX}/bin:$PATH
 RUN apt-get update -qq --yes > /dev/null && \
     apt-get install --yes -qq gnupg2 > /dev/null && \
     rm -rf /var/lib/apt/lists/*
+
+# Install Node.js and npm
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm@latest
 
 RUN apt-get -y update \
  && apt-get install -y dbus-x11 \
