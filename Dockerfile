@@ -69,7 +69,7 @@ RUN pip install spatialpandas easydev colormap colorcet duckdb dask_geopandas hy
 RUN pip install --upgrade colorama
 
 # Install nb_black separately to address metadata generation issue
-RUN pip install nb_black==1.0.7
+RUN pip install nb_black==1.0.5
 
 # Gfortran support
 #RUN apt-get update && \
