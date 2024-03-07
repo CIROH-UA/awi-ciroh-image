@@ -65,6 +65,9 @@ RUN apt-get update && \
 # Install packages: spatialpandas, easydev, colormap, colorcet, duckdb, dask_geopandas, hydrotools, sidecar
 RUN pip install spatialpandas easydev colormap colorcet duckdb dask_geopandas hydrotools sidecar
 
+# Upgrade colorama to resolve dependency conflict
+RUN pip install --upgrade colorama
+
 # Install nb_black separately to address metadata generation issue
 RUN pip install nb_black==1.0.7
 
