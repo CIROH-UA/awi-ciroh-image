@@ -3,7 +3,7 @@
 # and linked from here:
 # https://github.com/2i2c-org/infrastructure/issues/1444#issuecomment-1187405324
 
-FROM pangeo/pangeo-notebook:2023.01.13
+FROM pangeo/pangeo-notebook:2023.09.11
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive
@@ -13,6 +13,10 @@ ENV PATH ${NB_PYTHON_PREFIX}/bin:$PATH
 RUN apt-get update -qq --yes > /dev/null && \
     apt-get install --yes -qq gnupg2 > /dev/null && \
     rm -rf /var/lib/apt/lists/*
+
+# Install Node.js and npm
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get install -y nodejs
 
 RUN apt-get -y update \
  && apt-get install -y dbus-x11 \
@@ -38,7 +42,9 @@ RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}
 
 RUN mamba install -n ${CONDA_ENV} -y websockify
 
+# Install jupyter-remote-desktop-proxy with compatible npm version
 RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
+ && npm install -g npm@7.24.0 \
  && pip install --no-cache-dir \
         https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
 
@@ -56,8 +62,14 @@ RUN apt-get update && \
     apt-get update -y && \
     apt-get install google-cloud-sdk -y
 
-# Install packages: spatialpandas, easydev, colormap, colorcet, duckdb, dask_geopandas, nb_black, hydrotools, sidecar
-RUN pip install spatialpandas easydev colormap colorcet duckdb dask_geopandas nb_black hydrotools sidecar
+# Install packages: spatialpandas, easydev, colormap, colorcet, duckdb, dask_geopandas, hydrotools, sidecar
+RUN pip install spatialpandas easydev colormap colorcet duckdb dask_geopandas hydrotools sidecar
+
+# Upgrade colorama to resolve dependency conflict
+RUN pip install --upgrade colorama
+
+# Install nb_black separately to address metadata generation issue
+RUN pip install nb_black==1.0.5
 
 # Gfortran support
 #RUN apt-get update && \
