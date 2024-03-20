@@ -78,7 +78,7 @@ RUN pip install nb_black==1.0.5
 #RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
 # Install nbfetch for hydroshare
-RUN pip install -U --no-cache-dir --upgrade-strategy only-if-needed git+https://github.com/hydroshare/nbfetch.git@master
+RUN pip install -U --no-cache-dir --upgrade-strategy only-if-needed git+https://github.com/hydroshare/nbfetch.git@hspuller-auth
 # enable jupyter_server extension
 RUN jupyter server extension enable --py nbfetch --sys-prefix
 
