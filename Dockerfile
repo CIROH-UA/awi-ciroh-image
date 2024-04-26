@@ -14,10 +14,6 @@ RUN apt-get update -qq --yes > /dev/null && \
     apt-get install --yes -qq gnupg2 > /dev/null && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Node.js and npm
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y nodejs
-
 RUN apt-get -y update \
  && apt-get install -y dbus-x11 \
    firefox \
@@ -27,7 +23,12 @@ RUN apt-get -y update \
    xfce4-settings \
    xorg \
    xubuntu-icon-theme \
+   curl \
  && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js and npm
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get install -y nodejs
 
 # Install TurboVNC (https://github.com/TurboVNC/turbovnc)
 ARG TURBOVNC_VERSION=2.2.6
