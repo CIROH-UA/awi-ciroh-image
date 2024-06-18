@@ -1,1 +1,1 @@
-conda install lightgbm
+pip install scikit-learn
