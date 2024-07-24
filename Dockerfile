@@ -92,4 +92,7 @@ RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/s
 # Install dataretrieval package
 RUN pip install dataretrieval
 
+# Adding r kernel
+RUN conda install -c r r-irkernel
+
 USER ${NB_USER}
