@@ -8,22 +8,31 @@ USER root
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PATH ${NB_PYTHON_PREFIX}/bin:$PATH
 
-# Needed for apt-key to work
-RUN apt-get update -qq --yes > /dev/null && \
-    apt-get install --yes -qq gnupg2 > /dev/null && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN apt-get -y update \
- && apt-get install -y dbus-x11 \
-   firefox \
-   xfce4 \
-   xfce4-panel \
-   xfce4-session \
-   xfce4-settings \
-   xorg \
-   xubuntu-icon-theme \
-   curl \
- && rm -rf /var/lib/apt/lists/*
+# Install necessary packages
+RUN apt-get update -qq --yes && \
+    apt-get install -y --no-install-recommends \
+    gnupg2 \
+    dbus-x11 \
+    firefox \
+    xfce4 \
+    xfce4-panel \
+    xfce4-session \
+    xfce4-settings \
+    xorg \
+    xubuntu-icon-theme \
+    curl \
+    libfontconfig1-dev \
+    libgdal-dev \
+    libgeos-dev \
+    libproj-dev \
+    nco \
+    build-essential \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    libudunits2-dev \
+    libnetcdf-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js and npm (if needed for any web-based tools)
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
@@ -54,8 +63,13 @@ RUN apt-get update && \
     apt-get install google-cloud-sdk -y
 
 # Install R and IRkernel
-RUN mamba install -n ${CONDA_ENV} -c r r-irkernel -y \
-    && /srv/conda/envs/notebook/bin/R -e "IRkernel::installspec(user = FALSE)"
+RUN mamba install -n ${CONDA_ENV} -c conda-forge r-base r-irkernel r-devtools r-sp r-stringr r-plyr r-ggplot2 r-terra r-ncdf4 -y && \
+    /srv/conda/envs/notebook/bin/R -e "IRkernel::installspec(user = FALSE)"
+
+# Install additional R packages
+RUN /srv/conda/envs/notebook/bin/R -e "install.packages(c('rgdal', 'ggmap'), repos='https://cloud.r-project.org/')" && \
+    /srv/conda/envs/notebook/bin/R -e "devtools::install_github('NCAR/rwrfhydro')"
+
 
 # # Install tini
 # RUN apt-get update && apt-get install -y tini
