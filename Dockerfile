@@ -99,17 +99,14 @@ RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.c
     apt-get update -y && \
     apt-get install google-cloud-sdk -y
 
-# Set up Jupyter Lab
-RUN mkdir /opt/notebooks && \
-    jupyter notebook --generate-config && \
-    echo "c.NotebookApp.ip = '0.0.0.0'" >> ~/.jupyter/jupyter_notebook_config.py && \
-    echo "c.NotebookApp.open_browser = False" >> ~/.jupyter/jupyter_notebook_config.py
+# # Install tini
+# RUN apt-get update && apt-get install -y tini
 
-WORKDIR /opt/notebooks
+# # Set environment variables
+# ENV JUPYTER_ENABLE_LAB=yes
 
-# # Expose port for Jupyter Lab
-# EXPOSE 8888
+# # Set the entrypoint to start Jupyter Lab
+# ENTRYPOINT ["tini", "-g", "--"]
+# CMD ["jupyter", "lab", "--ip=0.0.0.0", "--no-browser", "--allow-root"]
 
-# # Start Jupyter Lab
-# CMD ["jupyter", "lab", "--ip=0.0.0.0", "--allow-root"]
 USER ${NB_USER}
