@@ -112,3 +112,4 @@ WORKDIR /opt/notebooks
 
 # # Start Jupyter Lab
 # CMD ["jupyter", "lab", "--ip=0.0.0.0", "--allow-root"]
+USER ${NB_USER}
