@@ -1,95 +1,223 @@
-# This Dockerfile aims to provide a Pangeo-style image with the VNC/Linux Desktop feature
-# It was constructed by following the instructions and copying code snippets laid out
-# and linked from here:
-# https://github.com/2i2c-org/infrastructure/issues/1444#issuecomment-1187405324
-
 FROM pangeo/pangeo-notebook:2024.04.08
 
 USER root
+
 ENV DEBIAN_FRONTEND=noninteractive
-ENV PATH ${NB_PYTHON_PREFIX}/bin:$PATH
+ENV PATH=${NB_PYTHON_PREFIX}/bin:$PATH
+ENV NB_USER=jovyan
+ENV HOME=/home/${NB_USER}
 
-# Needed for apt-key to work
-RUN apt-get update -qq --yes > /dev/null && \
-    apt-get install --yes -qq gnupg2 > /dev/null && \
-    rm -rf /var/lib/apt/lists/*
+# Set conda environment name
+ENV CONDA_ENV=notebook
 
-RUN apt-get -y update \
- && apt-get install -y dbus-x11 \
-   firefox \
-   xfce4 \
-   xfce4-panel \
-   xfce4-session \
-   xfce4-settings \
-   xorg \
-   xubuntu-icon-theme \
-   curl \
- && rm -rf /var/lib/apt/lists/*
+# Update and install basic utilities and R dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg2 \
+    xz-utils \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    libgdal-dev \
+    libgeos-dev \
+    libproj-dev \
+    libudunits2-dev \
+    libfontconfig1-dev \
+    libcairo2-dev \
+    libxt-dev \
+    nco \
+    proj-data \
+    dbus-x11 \
+    firefox \
+    xfce4 \
+    xfce4-panel \
+    xfce4-session \
+    xfce4-settings \
+    xorg \
+    xubuntu-icon-theme \
+    tini \
+    && rm -rf /var/lib/apt/lists/* \
+    && echo "Basic utilities and R dependencies installed successfully"
 
-# Install Node.js and npm
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y nodejs
+# Install Node.js
+ENV NODE_VERSION=16.20.0
+RUN curl -fsSLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
+    && tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /usr/local --strip-components=1 --no-same-owner \
+    && rm "node-v$NODE_VERSION-linux-x64.tar.xz" \
+    && ln -s /usr/local/bin/node /usr/local/bin/nodejs \
+    && echo "Node.js installed successfully"
 
-# Install TurboVNC (https://github.com/TurboVNC/turbovnc)
+# Install TurboVNC
 ARG TURBOVNC_VERSION=2.2.6
 RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}/turbovnc_${TURBOVNC_VERSION}_amd64.deb/download" -O turbovnc.deb \
- && apt-get update -qq --yes > /dev/null \
- && apt-get install -y ./turbovnc.deb > /dev/null \
- # remove light-locker to prevent screen lock
- && apt-get remove -y light-locker > /dev/null \
- && rm ./turbovnc.deb \
- && ln -s /opt/TurboVNC/bin/* /usr/local/bin/ \
- && rm -rf /var/lib/apt/lists/*
+    && apt-get update -qq --yes > /dev/null \
+    && apt-get install -y ./turbovnc.deb > /dev/null \
+    && apt-get remove -y light-locker > /dev/null \
+    && rm ./turbovnc.deb \
+    && ln -s /opt/TurboVNC/bin/* /usr/local/bin/ \
+    && rm -rf /var/lib/apt/lists/* \
+    && echo "TurboVNC installed successfully"
 
-RUN mamba install -n ${CONDA_ENV} -y websockify
+# Set up permissions for jovyan user
+RUN mkdir -p ${HOME}/.local/share/jupyter \
+    && chown -R ${NB_USER}:users ${HOME}
 
-# Install jupyter-remote-desktop-proxy with compatible npm version
-RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
- && npm install -g npm@7.24.0 \
- && pip install --no-cache-dir \
-        https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip
-
-# Install jupyterlab_vim extension
-RUN pip install jupyterlab_vim
-
-# TO download the folder/files:
-RUN pip install jupyter-tree-download
-
-# Install Google Cloud SDK (gcloud, gsutil)
-RUN apt-get update && \
-    apt-get install -y curl gnupg && \
-    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
-    apt-get update -y && \
-    apt-get install google-cloud-sdk -y
-
-# Install packages: spatialpandas, easydev, colormap, colorcet, duckdb, dask_geopandas, hydrotools, sidecar
-RUN pip install spatialpandas easydev colormap colorcet duckdb dask_geopandas hydrotools sidecar
-
-# Upgrade colorama to resolve dependency conflict
-RUN pip install --upgrade colorama
-
-# Install nb_black separately to address metadata generation issue
-RUN pip install nb_black==1.0.5
-
-# Gfortran support
-#RUN apt-get update && \
-#    apt-get install -yq python3.9 python3-pip python3-wheel make cmake gfortran gcc-multilib libnetcdff-dev libcoarrays-dev libopenmpi-dev && \
-#    apt-get clean -q
-#RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
-
-# Install nbfetch for hydroshare
-RUN pip install -U --no-cache-dir --upgrade-strategy only-if-needed git+https://github.com/hydroshare/nbfetch.git@hspuller-auth
-# enable jupyter_server extension
-RUN jupyter server extension enable --py nbfetch --sys-prefix
-
-# Install google cloud bigquery
-RUN pip install google-cloud-bigquery
-
-# Update custom Jupyter Lab settings
-RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
-
-# Install dataretrieval package
-RUN pip install dataretrieval
-
+# Switch to jovyan user for conda and pip installations
 USER ${NB_USER}
+WORKDIR ${HOME}
+
+# Ensure conda and npm are in the PATH
+ENV PATH=${HOME}/.local/bin:${CONDA_DIR}/bin:$PATH
+
+# Install websockify
+RUN conda install -n ${CONDA_ENV} -y websockify && \
+    echo "websockify installed successfully" || echo "websockify installation failed"
+
+# Update npm
+RUN npm install -g npm@7.24.0 && \
+    echo "npm updated successfully" || echo "npm update failed"
+
+# Install jupyter-remote-desktop-proxy
+RUN pip install --no-cache-dir \
+    https://github.com/jupyterhub/jupyter-remote-desktop-proxy/archive/main.zip && \
+    echo "jupyter-remote-desktop-proxy installed successfully" || echo "jupyter-remote-desktop-proxy installation failed"
+
+# Update conda and install mamba for faster package resolution
+RUN conda update -n base -c conda-forge conda && \
+    conda install -n base -c conda-forge mamba
+
+# Create a new conda environment with R and necessary packages
+RUN mamba create -n r_env -c conda-forge \
+    r-base=4.3 \
+    r-essentials \
+    r-devtools \
+    r-rgdal \
+    r-stringr \
+    r-plyr \
+    r-ggplot2 \
+    r-ggmap \
+    r-terra \
+    r-ncdf4 \
+    r-rcurl \
+    r-raster \
+    r-sp \
+    r-rcpparmadillo \
+    compilers \
+    make \
+    libgcc-ng \
+    && echo "Conda packages installed successfully"
+
+# Set up environment variables
+ENV PATH="/srv/conda/envs/r_env/bin:${PATH}"
+ENV CONDA_DEFAULT_ENV="r_env"
+
+# Activate conda environment and install R packages
+SHELL ["/bin/bash", "-c"]
+RUN conda init bash && \
+    echo "conda activate r_env" >> ~/.bashrc && \
+    . ~/.bashrc && \
+    R --version && \
+    R -e "options(warn=2); \
+    install_package <- function(pkg) { \
+        tryCatch({ \
+            cat('Installing', pkg, '...\n'); \
+            install.packages(pkg, repos='https://cloud.r-project.org/', dependencies=TRUE, verbose=TRUE); \
+            cat(pkg, 'installed successfully\n') \
+        }, error = function(e) { \
+            cat('Error installing', pkg, ':', conditionMessage(e), '\n') \
+        }) \
+    }; \
+    sapply(c('dotCall64', 'spam', 'fields', 'ptw', 'pander', 'biwavelet', 'pastecs', 'dataRetrieval'), install_package);"
+
+# Comment out rwrfhydro installation
+# RUN . ~/.bashrc && \
+#     R -e "cat('Installing rwrfhydro...\n'); \
+#     devtools::install_github('NCAR/rwrfhydro', dependencies=TRUE, upgrade='never', force=TRUE, verbose=TRUE); \
+#     if('rwrfhydro' %in% installed.packages()[,'Package']) { \
+#         cat('rwrfhydro installed successfully\n') \
+#     } else { \
+#         stop('rwrfhydro installation failed') \
+#     }" && \
+#     echo "rwrfhydro and its dependencies installation process completed"
+
+# Comment out rwrfhydro verification
+# RUN . ~/.bashrc && \
+#     R -e "library(rwrfhydro); cat('rwrfhydro loaded successfully\n')"
+
+# Install additional Python packages and Jupyter extensions
+RUN pip install --no-cache-dir \
+    jupyter-tree-download \
+    spatialpandas \
+    easydev \
+    colormap \
+    colorcet \
+    duckdb \
+    dask_geopandas \
+    hydrotools \
+    sidecar \
+    google-cloud-bigquery \
+    dataretrieval \
+    nb_black==1.0.5 \
+    git+https://github.com/hydroshare/nbfetch.git@hspuller-auth && \
+    echo "Python packages and Jupyter extensions installed successfully" || echo "Some Python packages failed to install"
+
+# Install jupyterlab_vim separately
+RUN pip install --no-cache-dir jupyterlab_vim && \
+    jupyter labextension install @axlair/jupyterlab_vim && \
+    echo "jupyterlab_vim installed successfully" || echo "jupyterlab_vim installation failed"
+
+# Enable jupyter_server extension
+RUN jupyter server extension enable --py nbfetch --sys-prefix \
+    && echo "jupyter_server extension enabled successfully"
+
+# Switch back to root for Google Cloud SDK installation
+USER root
+
+# Install Google Cloud SDK
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
+    && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
+    && apt-get update -y \
+    && apt-get install -y google-cloud-sdk \
+    && rm -rf /var/lib/apt/lists/* \
+    && echo "Google Cloud SDK installed successfully"
+
+# Update custom Jupyter Lab settings and run diagnostics
+RUN echo "Checking Jupyter Lab extensions..." && \
+    jupyter labextension list || true && \
+    echo "Checking for vim plugin file..." && \
+    find /srv/conda/envs/notebook/share/jupyter -name "plugin.json" | grep jupyterlab_vim || true && \
+    if [ -f /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json ]; then \
+        sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json && \
+        echo "Jupyter Lab settings updated successfully"; \
+    else \
+        echo "Jupyter Lab vim plugin file not found, skipping settings update"; \
+    fi && \
+    echo "Jupyter Lab settings check completed"
+
+# Switch back to jovyan user
+USER ${NB_USER}
+
+# Verify R installation and packages
+RUN R --version && \
+    R -e "installed.packages()[,c(1,3:4)]" && \
+    echo "R installation and packages verified"
+
+# Verify conda environment
+RUN conda list -n ${CONDA_ENV} && \
+    echo "Conda environment verified"
+
+# Verify Jupyter kernels
+RUN jupyter kernelspec list && \
+    echo "Jupyter kernels listed"
+
+# Verify R kernel installation
+RUN R -e "IRkernel::installspec(user = TRUE)" \
+    && jupyter kernelspec list \
+    && echo "R kernel installation verified"
+
+# Set environment variables
+ENV JUPYTER_ENABLE_LAB=yes
+
+# # Set the entrypoint to start Jupyter Lab
+# ENTRYPOINT ["tini", "-g", "--"]
+# CMD ["jupyter", "lab", "--ip=0.0.0.0", "--no-browser"]
