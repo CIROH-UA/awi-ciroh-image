@@ -90,6 +90,6 @@ RUN pip install google-cloud-bigquery
 RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
 
 # Install dataretrieval package
-RUN pip install dataretrieval
+#RUN pip install dataretrieval
 
 USER ${NB_USER}
