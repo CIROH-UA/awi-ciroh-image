@@ -1,6 +1,6 @@
 # hub-user-image-template :paperclip:
 
-This is a template repository for creating dedicated user images for 2i2c hubs.
+This is a template repository for creating dedicated user images for 2i2c hubs. Test
 
 ## Overall workflow :gear:
 
