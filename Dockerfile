@@ -92,4 +92,17 @@ RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/s
 # Install dataretrieval package
 RUN pip install dataretrieval
 
+# Install venv and create a new virtual environment
+RUN apt-get update && apt-get install -y python3-venv \
+    && python3 -m venv /opt/venvs/myenv
+
+# Install required packages in the virtual environment
+RUN /opt/venvs/myenv/bin/pip install numpy pandas ipykernel
+
+# Register the virtual environment with Jupyter
+RUN /opt/venvs/myenv/bin/python -m ipykernel install --user --name=myenv --display-name "Python (myenv)"
+
+# Ensure the new virtual environment is prioritized
+ENV PATH="/opt/venvs/myenv/bin:$PATH"
+
 USER ${NB_USER}
