@@ -2,6 +2,9 @@ name: Test container image build
 
 on:
   pull_request:
+  push:
+    branches:
+      - develop
 
 jobs:
   test-build:
