@@ -96,8 +96,9 @@ RUN pip install dataretrieval
 RUN apt-get update && apt-get install -y python3-venv \
     && python3 -m venv /opt/venvs/myenv
 
-# Install required packages in the virtual environment
-RUN /opt/venvs/myenv/bin/pip install numpy pandas ipykernel
+# Install ngiab_data_preprocess in the new virtual environment
+RUN /opt/venvs/myenv/bin/pip install 'ngiab_data_preprocess'
+
 
 # Register the virtual environment with Jupyter
 RUN /opt/venvs/myenv/bin/python -m ipykernel install --user --name=myenv --display-name "Python (myenv)"
