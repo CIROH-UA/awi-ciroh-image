@@ -100,9 +100,6 @@ RUN apt-get update && apt-get install -y python3-venv \
 RUN /opt/venvs/myenv/bin/pip install 'ngiab_data_preprocess'
 
 
-# Register the virtual environment with Jupyter
-RUN /opt/venvs/myenv/bin/python -m ipykernel install --user --name=myenv --display-name "Python (myenv)"
-
 # Ensure the new virtual environment is prioritized
 ENV PATH="/opt/venvs/myenv/bin:$PATH"
 
