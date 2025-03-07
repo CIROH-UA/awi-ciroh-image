@@ -92,16 +92,7 @@ RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/s
 # Install dataretrieval package
 RUN pip install dataretrieval
 
-# Install venv and create a new virtual environment
-RUN apt-get update && apt-get install -y python3-venv \
-    && python3 -m venv /opt/venvs/myenv
-
-# Install ngiab_data_preprocess in the new virtual environment
-RUN /opt/venvs/myenv/bin/pip install 'ngiab_data_preprocess'
-
-
-# Ensure the new virtual environment is prioritized
-ENV PATH="/opt/venvs/myenv/bin:$PATH"
-
+# Install data preprocess
+RUN pip install 'ngiab_data_preprocess'
 
 USER ${NB_USER}
