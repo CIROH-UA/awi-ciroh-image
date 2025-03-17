@@ -78,10 +78,13 @@ RUN pip install nb_black==1.0.5
 #    apt-get clean -q
 #RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
-# Install nbfetch for hydroshare
-RUN pip install -U --no-cache-dir --upgrade-strategy only-if-needed git+https://github.com/hydroshare/nbfetch.git@hspuller-auth
-# enable jupyter_server extension
-RUN jupyter server extension enable --py nbfetch --sys-prefix
+# HydroShare packages - install nbfetch, hsclient
+RUN pip install hsclient[all]==1.1.6 \
+		pydantic==2.7.*
+
+RUN pip install -U --no-cache-dir --upgrade-strategy only-if-needed \
+    git+https://github.com/hydroshare/nbfetch.git@v0.6.3 \
+ && jupyter server extension enable --py nbfetch --sys-prefix
 
 # Install google cloud bigquery
 RUN pip install google-cloud-bigquery
