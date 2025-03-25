@@ -92,7 +92,10 @@ RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/s
 # Install dataretrieval package
 RUN pip install dataretrieval
 
-# Install data preprocess
-RUN pip install 'ngiab_data_preprocess'
+# Create a new conda environment called NGAIB
+RUN mamba create -n NGAIB -y python=3.9
+
+# Install ngiab_data_preprocess in the new NGAIB environment
+RUN /opt/conda/envs/NGAIB/bin/pip install 'ngiab_data_preprocess'
 
 USER ${NB_USER}
