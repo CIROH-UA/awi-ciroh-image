@@ -95,7 +95,7 @@ RUN pip install dataretrieval
 # Create a new conda environment called NGAIB
 RUN mamba create -n NGAIB -y python=3.9
 
-# Install ngiab_data_preprocess in the new NGAIB environment
-RUN /opt/conda/envs/NGAIB/bin/pip install 'ngiab_data_preprocess'
+# Activate the environment and install the package
+RUN /bin/bash -c "source activate NGAIB && pip install 'ngiab_data_preprocess'"
 
 USER ${NB_USER}
