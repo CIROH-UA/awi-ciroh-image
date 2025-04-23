@@ -95,4 +95,10 @@ RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/s
 # Install dataretrieval package
 RUN pip install dataretrieval
 
+# Install hsfiles-jupyter
+RUN pip install hsfiles-jupyter
+
+# Link hsfiles-jupyter to JupyterLab
+RUN python -m hsfiles_jupyter
+
 USER ${NB_USER}
