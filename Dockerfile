@@ -96,7 +96,7 @@ RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/s
 RUN pip install dataretrieval
 
 # Install hsfiles-jupyter from test pypi
-RUN pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ hsfiles-jupyter
+RUN pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ hsfiles-jupyter==0.1.0b21
 
 # Link hsfiles-jupyter to JupyterLab
 RUN python -m hsfiles_jupyter
