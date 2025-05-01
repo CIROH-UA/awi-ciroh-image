@@ -253,7 +253,7 @@ ENV RDMAV_FORK_SAFE=1
 # PyNGIAB (https://github.com/fbaig/ciroh_pyngiab)
 ##########
 
-RUN pip install git+https://github.com/fbaig/ciroh_pyngiab.git@pypi
+RUN pip install git+https://github.com/fbaig/ciroh_pyngiab.git
 
 WORKDIR /ngen/
 USER ${NB_USER}
