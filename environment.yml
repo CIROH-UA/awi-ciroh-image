@@ -4,5 +4,3 @@ channels:
 dependencies:
   - lightgbm
   - optuna
-  - rstudio
-  - jupyter-rsession-proxy
