@@ -1,0 +1,30 @@
+name: notebook
+channels:
+  - conda-forge
+dependencies:
+  - python<3.13
+  - numpy
+  - pandas
+  - scipy
+  - sphinx
+  - pytest
+  - coverage
+  - flake8
+  - pylint
+  - dataretrieval
+  - matplotlib
+  - folium
+  - mapclassify
+  - pynhd>=0.18.0
+  - tqdm
+  - pydeps==1.12.3
+  - pip
+  - nbsphinx
+  - sphinx-rtd-theme
+  - ipykernel
+  - jupyter
+  - pip:
+    - datetime
+    - nbsphinx_link
+    - pydocstringformatter
+    - hyswap
