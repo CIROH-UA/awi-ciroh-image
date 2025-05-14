@@ -532,7 +532,6 @@ dependencies:
   - r-ggthemes
   - r-tidync
   - r-terra
-  - r-nwmTools
   - r-dataRetrieval
   - r-tsibble
   - r-zoo
