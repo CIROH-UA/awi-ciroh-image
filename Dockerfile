@@ -12,9 +12,9 @@ ENV PATH ${NB_PYTHON_PREFIX}/bin:$PATH
 # Needed for apt-key to work
 RUN apt-get update -qq --yes > /dev/null && \
     apt-get install --yes -qq gnupg2 > /dev/null && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* >> /dev/null
 
-RUN apt-get -y update \
+RUN apt-get -y update >> /dev/null\
  && apt-get install -y dbus-x11 \
    firefox \
    xfce4 \
@@ -23,8 +23,9 @@ RUN apt-get -y update \
    xfce4-settings \
    xorg \
    xubuntu-icon-theme \
-   curl \
- && rm -rf /var/lib/apt/lists/*
+   curl \ 
+   >> /dev/null \
+ && rm -rf /var/lib/apt/lists/* >> /dev/null
 
 # Install Node.js and npm
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
@@ -78,14 +79,6 @@ RUN pip install nb_black==1.0.5
 #    apt-get clean -q
 #RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
-# HydroShare packages - install nbfetch, hsclient
-RUN pip install hsclient[all]==1.1.6 \
-		pydantic==2.7.*
-
-RUN pip install -U --no-cache-dir --upgrade-strategy only-if-needed \
-    git+https://github.com/hydroshare/nbfetch.git@v0.6.3 \
- && jupyter server extension enable --py nbfetch --sys-prefix
-
 # Install google cloud bigquery
 RUN pip install google-cloud-bigquery
 
@@ -95,10 +88,32 @@ RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/s
 # Install dataretrieval package
 RUN pip install dataretrieval
 
-# Install hsfiles-jupyter
-RUN pip install hsfiles-jupyter
+# Execute remaining commands through bash
+SHELL ["/bin/bash", "--login", "-c"]
 
-# Link hsfiles-jupyter to JupyterLab
-RUN python -m hsfiles_jupyter
+# From template, hydroShare packages - install nbfetch, hsclient, hsfiles-jupyter
+RUN conda init bash \
+ && . ~/.bashrc \
+ && conda activate notebook \
+ && pip install hsclient[all]==1.1.6 \
+		pydantic==2.7.* \
+ && pip install hsfiles-jupyter \
+ && python -m hsfiles_jupyter
 
-USER ${NB_USER}
+RUN pip install -U --no-cache-dir --upgrade-strategy only-if-needed \
+    git+https://github.com/hydroshare/nbfetch.git@v0.6.3 \
+ && jupyter server extension enable --py nbfetch --sys-prefix
+
+# For workshop: Install optuna, lightgb
+RUN conda init bash \
+ && . ~/.bashrc \
+ && conda activate notebook \
+ && conda install optuna lightgbm \
+ && conda deactivate
+
+ # For workshop: install R environment'
+COPY environment_r.yml ${HOME}
+RUN conda init bash \
+ && . ~/.bashrc \
+ && conda env create -n r_env --file environment_r.yml
+RUN rm environment_r.yml
