@@ -520,3 +520,25 @@ dependencies:
   - zlib=1.3.1=h4ab18f5_1
   - zstandard=0.23.0=py312hef9b889_1
   - zstd=1.5.6=ha6fb4c9_0
+  - r-parsnip
+  - r-tune
+  - r-dials
+  - r-workflows
+  - r-yardstick
+  - r-bonsai
+  - r-tidymodels
+  - r-hydroGOF
+  - r-lightgbm
+  - r-ggthemes
+  - r-tidync
+  - r-terra
+  - r-nwmTools
+  - r-dataRetrieval
+  - r-tsibble
+  - r-zoo
+  - r-slider
+  - r-sbtools
+  - pip:
+      - dask==2024.9.0
+      - dask-expr==1.1.14
+      - dask-geopandas==0.4.2
