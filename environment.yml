@@ -1,0 +1,4 @@
+dependencies:
+ - scipy
+ - pytorch
+ - numpy 
