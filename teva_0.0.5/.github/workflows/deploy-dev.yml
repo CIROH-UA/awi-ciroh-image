@@ -1,0 +1,45 @@
+on:
+  push:
+    branches:
+      - main
+
+env:
+  CONTEXT: development
+  CONTEXT_SHORTHAND: dev
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - run: chmod +x linting/linting.sh
+      - name: Install dependencies
+        run: |
+          pip install pylint
+
+      - name: Run pylint and capture exit status
+        id: pylint
+        run: ./linting/linting.sh teva
+
+  unit-testing:
+    runs-on: ubuntu-latest
+    needs: linting
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install requirements
+        run: python -m pip install -r requirements.txt
+      - name: Run Unit Tests
+        run: python -m pytest --capture=no unit_tests --junitxml=unit_tests/test-results.xml --continue-on-collection-errors
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2.7.0
+        if: always()
+        with:
+          job_summary: true
+          files: |
+            unit_tests/test-results.xml

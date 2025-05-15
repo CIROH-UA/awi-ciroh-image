@@ -1,0 +1,22 @@
+name: teva-workshop
+channels:
+  - bioconda
+  - conda-forge
+dependencies: 
+  - python>=3.12
+  - pip
+  - matplotlib==3.9.1
+  - numpy==2.0.1
+  - pandas==2.2.2
+  - openpyxl==3.1.5
+  - sphinx==7.2.6
+  - pylint
+  - scipy==1.14.0
+  - termcolor==2.4.0
+  - seaborn
+  - pip:
+      - ipykernel
+      - bokeh
+      - sphinx-book-theme==1.1.2
+      - pytest==8.1.1
+      - . # this runs the setup.py to build TEVA
