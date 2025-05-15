@@ -1,5 +1,5 @@
 dependencies:
-- python==3.10.0
+- python==3.9.0
 - _libgcc_mutex
 - _openmp_mutex
 - backcall
