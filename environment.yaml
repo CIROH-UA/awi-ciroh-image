@@ -19,3 +19,4 @@ dependencies:
       - bokeh
       - sphinx-book-theme==1.1.2
       - pytest==8.1.1
+      - ./teva_0.0.5
