@@ -1,8 +1,6 @@
 channels:
 - defaults
 - conda-forge
-- https://repo.anaconda.com/pkgs/main
-- https://repo.anaconda.com/pkgs/r
 dependencies:
 - python==3.10.0
 - _libgcc_mutex
