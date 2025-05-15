@@ -1,4 +1,4 @@
-name: teva-workshop
+name: notebook
 channels:
   - bioconda
   - conda-forge
