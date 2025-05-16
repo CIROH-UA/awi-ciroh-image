@@ -1,4 +1,2 @@
-pwd
-mkdir datasets
-cd datasets
 wget -q https://www.hydroshare.org/resource/504107925379464dab88ff5780aefb5a/data/contents/Data/CAMELS_cleaned.csv
+sudo chmod 777 CAMELS_cleaned.csv
