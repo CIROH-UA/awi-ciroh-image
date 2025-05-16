@@ -1,0 +1,24 @@
+name: mlhydrogeospatial_cpu
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.10
+  - xarray
+  - netCDF4
+  - pytorch
+  - cpuonly
+  - numpy
+  - pandas
+  - matplotlib
+  - jupyter
+  - tqdm
+  - scikit-image
+  - scipy
+  - pyyaml
+  - pip
+  - pip:
+      - tensorboard
+      - torchviz
