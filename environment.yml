@@ -15,6 +15,7 @@ dependencies:
   - wheel=0.45.1
   - xz=5.6.4
   - zlib=1.2.13
+  - scipy
   - pip:
       - alabaster==0.7.16
       - appnope==0.1.4
@@ -89,7 +90,6 @@ dependencies:
       - pyyaml==6.0.2
       - pyzmq==26.4.0
       - requests==2.32.3
-      - scipy==1.15.3
       - six==1.17.0
       - snowballstemmer==3.0.1
       - sphinx==7.2.6
