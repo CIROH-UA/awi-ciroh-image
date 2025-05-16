@@ -95,6 +95,9 @@ RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/s
 # Install dataretrieval package
 RUN pip install dataretrieval
 
+# install additional packages needed for running AORC related notebooks
+RUN pip install contextily exactextract
+
 # Install hsfiles-jupyter
 RUN pip install hsfiles-jupyter
 
