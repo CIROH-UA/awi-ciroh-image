@@ -1,5 +1,9 @@
+channels:
+- defaults
+- conda-forge
+- https://repo.anaconda.com/pkgs/main
+- https://repo.anaconda.com/pkgs/r
 dependencies:
-- python=3.7.12
 - _libgcc_mutex
 - _openmp_mutex
 - backcall
@@ -92,7 +96,6 @@ dependencies:
 - nspr
 - nss
 - numexpr
-- numpy
 - openblas
 - openssl
 - packaging
@@ -112,7 +115,7 @@ dependencies:
 - pyparsing
 - pyqt
 - pyqt5-sip
-- python
+- python=3.7.12
 - python-dateutil
 - python_abi
 - pytz
@@ -128,8 +131,6 @@ dependencies:
 - six
 - sqlite
 - statsmodels
-- tensorflow
-- tensorflow-estimator
 - threadpoolctl
 - tk
 - toml
@@ -201,6 +202,7 @@ dependencies:
   - notebook==6.5.7
   - notebook-shim==0.2.4
   - numba==0.56.4
+  - numpy==1.18.5
   - opt-einsum==3.3.0
   - pandocfilters==1.5.1
   - pkgutil-resolve-name==1.3.10
@@ -219,6 +221,8 @@ dependencies:
   - sniffio==1.3.1
   - soupsieve==2.4.1
   - tensorboard==1.15.0
+  - tensorflow==1.15.0
+  - tensorflow-estimator==1.15.1
   - termcolor==2.3.0
   - terminado==0.17.1
   - tinycss2==1.2.1
