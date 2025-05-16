@@ -1,13 +1,4 @@
-chmod 777 datasets
-cd datasets
+mkdir /tmp/
+cd /tmp/
 wget -q https://www.hydroshare.org/resource/504107925379464dab88ff5780aefb5a/data/contents/Data/CAMELS_cleaned.csv
 chmod 777 CAMELS_cleaned.csv
-
-echo "------"
-ls
-echo "------"
-cd ..
-ls
-echo "------"
-pwd
-echo "------"
