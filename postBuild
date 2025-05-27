@@ -1,7 +1,7 @@
-mkdir /tmp/
+mkdir -p /tmp/
 mv ~/SHAPWorkshopDevCon /tmp/SHAPWorkshopDevCon
 cd /tmp/SHAPWorkshopDevCon
-mkdir Data
+mkdir -p Data
 cd Data
 wget -q https://www.hydroshare.org/resource/504107925379464dab88ff5780aefb5a/data/contents/Data/CAMELS_daymet_cleaned.csv
 wget -q https://www.hydroshare.org/resource/504107925379464dab88ff5780aefb5a/data/contents/Data/RF_classifier_DevCon.csv
