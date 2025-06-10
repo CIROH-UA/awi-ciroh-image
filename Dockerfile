@@ -66,6 +66,8 @@ RUN apt-get update && \
 # Install necessary dependencies to compile TauDEM
 RUN apt update && apt install -y \
     build-essential \
+    gcc \
+    g++ \
     cmake \
     openmpi-bin \
     libopenmpi-dev \
@@ -94,8 +96,8 @@ RUN git clone -b vscode-macos-dev-setup --single-branch https://github.com/dtarb
 WORKDIR /root/workspace/TauDEM
 
 # Build and install TauDEM
-RUN make clean && \
-    make dk-release COMPILER=linux && \
+RUN CC=/usr/bin/gcc CXX=/usr/bin/g++ make clean && \
+    CC=/usr/bin/gcc CXX=/usr/bin/g++ make dk-release COMPILER=linux && \
     make dk-install PREFIX=/usr/local && \
     echo "=== Validating installation ===" && \
     test -f /usr/local/taudem/pitremove || (echo "ERROR: pitremove not found in /usr/local/taudem" && exit 1) && \
