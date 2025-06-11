@@ -98,9 +98,10 @@ ENV OMPI_MCA_plm_rsh_agent=/bin/false \
     OMPI_MCA_btl_vader_single_copy_mechanism=none
 
 # Build and install TauDEM
-RUN PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin make clean && \
-    PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin make dk-release COMPILER=linux && \
-    PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin make dk-install PREFIX=/usr/local && \
+RUN export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin && \
+    make clean && \
+    make dk-release COMPILER=linux && \
+    make dk-install PREFIX=/usr/local && \
     echo "=== Validating installation ===" && \
     test -f /usr/local/taudem/pitremove || (echo "ERROR: pitremove not found in /usr/local/taudem" && exit 1) && \
     echo "SUCCESS: TauDEM installation validated - pitremove found"
