@@ -66,8 +66,6 @@ RUN apt-get update && \
 # Install necessary dependencies to compile TauDEM
 RUN apt update && apt install -y \
     build-essential \
-    gcc \
-    g++ \
     cmake \
     openmpi-bin \
     libopenmpi-dev \
