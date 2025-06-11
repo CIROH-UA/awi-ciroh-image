@@ -96,8 +96,8 @@ RUN git clone -b vscode-macos-dev-setup --single-branch https://github.com/dtarb
 WORKDIR /root/workspace/TauDEM
 
 # Build and install TauDEM
-RUN CC=/usr/bin/gcc CXX=/usr/bin/g++ make clean && \
-    CC=/usr/bin/gcc CXX=/usr/bin/g++ make dk-release COMPILER=linux && \
+RUN PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin make clean && \
+    PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin make dk-release COMPILER=linux && \
     make dk-install PREFIX=/usr/local && \
     echo "=== Validating installation ===" && \
     test -f /usr/local/taudem/pitremove || (echo "ERROR: pitremove not found in /usr/local/taudem" && exit 1) && \
