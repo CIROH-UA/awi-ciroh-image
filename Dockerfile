@@ -55,9 +55,9 @@ RUN pip install jupyterlab_vim
 # TO download the folder/files:
 RUN pip install jupyter-tree-download
 
-# Install Google Cloud SDK (gcloud, gsutil)
+# Install Google Cloud SDK (gcloud, gsutil) and s3fs-fuse
 RUN apt-get update && \
-    apt-get install -y curl gnupg && \
+    apt-get install -y curl gnupg s3fs && \
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
     apt-get update -y && \
