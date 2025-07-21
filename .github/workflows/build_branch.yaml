@@ -36,7 +36,7 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.QUAY_CIROH_PASSWORD }}
         DOCKER_REGISTRY: "quay.io"
         IMAGE_NAME: "awiciroh/devcon25"
-        ADDITIONAL_TAG: ${{ env.TAG_NAME}}
+        ADDITIONAL_TAG: "s3-browser"
 
     # Lets us monitor disks getting full as images get bigger over time
     - name: Show how much disk space is left
