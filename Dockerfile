@@ -101,4 +101,10 @@ RUN pip install hsfiles-jupyter
 # Link hsfiles-jupyter to JupyterLab
 RUN python -m hsfiles_jupyter
 
+# Install jupyterlab-s3-browser
+RUN pip install jupyterlab-s3-browser
+
+# Enable jupyterlab-s3-browser
+RUN jupyter server extension enable --py jupyterlab_s3_browser
+
 USER ${NB_USER}
