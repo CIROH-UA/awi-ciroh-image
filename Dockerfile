@@ -7,13 +7,6 @@ ENV NGEN_BRANCH=ngiab
 
 USER root
 
-###################################
-# remove conda/mamba gcc which seems to be broken in pangeo/pangeo-notebook:2024.04.08
-# when using with cmake
-# Reference: https://github.com/pangeo-data/pangeo-docker-images/issues/604
-###################################
-# RUN mamba remove --prefix /srv/conda/envs/notebook gcc gcc_linux-64 gcc_impl_linux-64 -y
-
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     vim gfortran sqlite3 libsqlite3-dev \
@@ -102,6 +95,14 @@ RUN mkdir -p /dmod/datasets /dmod/datasets/static /dmod/shared_libs /dmod/bin &&
     cd /dmod/bin && \
     (stat ngen-parallel && ln -s ngen-parallel ngen) || (stat ngen-serial && ln -s ngen-serial ngen)
 ###################################
+# [LSTM-Update]
+FROM base AS lstm_weights
+RUN git clone --depth=1 --branch example_weights https://github.com/ciroh-ua/lstm.git /lstm_weights
+# replace the relative path with the absolute path in the model config files
+RUN shopt -s globstar
+RUN sed -i 's|\.\.|/ngen/ngen/extern/lstm|g' /lstm_weights/trained_neuralhydrology_models/**/config.yml
+
+###################################
 FROM pangeo/pangeo-notebook:2024.04.08 AS final
 
 USER root
@@ -114,8 +115,8 @@ COPY --from=restructure_files /dmod /dmod
 COPY --from=troute_build /ngen/t-route/src/troute-*/dist/*.whl /tmp/
 COPY --from=ngen_clone /ngen/ngen/extern/lstm/lstm /ngen/ngen/extern/lstm
 
-# COPY --from=troute_build /tmp/troute_url /ngen/troute_url
-# COPY --from=ngen_build /tmp/ngen_url /ngen/ngen_url
+#COPY --from=troute_build /tmp/troute_url /ngen/troute_url
+#COPY --from=ngen_build /tmp/ngen_url /ngen/ngen_url
 
 # Install runtime-only dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -129,21 +130,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxcomposite1 libxdamage1 libxrandr2 libxt6 libatk1.0-0 libpango-1.0-0 \
     libgdk-pixbuf2.0-0 fonts-liberation \
     #---------------------------------------------
+    # TEEHR: (https://rtiinternational.github.io/teehr/getting_started/index.html)
+    #---------------------------------------------
+    openjdk-17-jdk \
+    #---------------------------------------------
     # 2i2c: Google Cloud SDK (gcloud, gsutil)
     #---------------------------------------------
     && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
     && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - \
     && apt-get update -y \
     && apt-get install google-cloud-sdk -y --no-install-recommends \
-    # #---------------------------------------------
-    # # 2i2c: Nodejs and npm
-    # #---------------------------------------------
-    # && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-    # && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
+# Set environment for ngen
 RUN ln -s /dmod/bin/ngen /usr/local/bin/ngen
 ENV FC=gfortran NETCDF=/usr/include PATH=$PATH:/usr/bin/mpich
+# [LSTM-Update]
+ENV UV_COMPILE_BYTECODE=1
+
+# Set softlink for mpi (required for spotpy calibration)
+#RUN ln -s /usr/lib/x86_64-linux-gnu/libmpi.so /usr/lib/x86_64-linux-gnu/libmpi.so.12
 
 # Install firefox for interactive workflows
 RUN mkdir -p /opt/firefox && \
@@ -152,15 +158,20 @@ RUN mkdir -p /opt/firefox && \
     ln -s /opt/firefox/firefox /usr/local/bin/firefox && \
     rm /tmp/firefox.tar.bz2
 
-# Set Firefox as the default browser (optional)
+# Set Firefox as the default browser
 ENV BROWSER=/usr/local/bin/firefox
 ENV XDG_BROWSER=/usr/local/bin/firefox
 
+# Set environment variables for TEEHR
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV PATH=$PATH:$JAVA_HOME/bin
+
 RUN pip3 install uv && \
-    uv pip install --system --no-cache-dir /tmp/*.whl netCDF4==1.6.3 \
-    numpy==$(/dmod/bin/ngen --info | grep -e 'NumPy Version: ' | cut -d ':' -f 2 | uniq | xargs) \
-    /ngen/ngen/extern/lstm --extra-index-url https://download.pytorch.org/whl/cpu \
+    uv pip install --system --no-cache-dir \
+    numpy==$(/dmod/bin/ngen --info | grep -m 1 -e 'NumPy Version: ' | cut -d ':' -f 2 | uniq | xargs) \
     jupyterlab_vim \
+    teehr==0.4.* \
+    git-lfs==1.6 \
     #---------------------------------------------
     # 2i2c: Install GIS packages
     #---------------------------------------------
@@ -178,13 +189,31 @@ RUN pip3 install uv && \
     # 2i2c: To enable linux desktop
     #---------------------------------------------
     jupyter-remote-desktop-proxy \
-    websockify
+    websockify \
+    #---------------------------------------------
+    # 2i2c: Hydroshare & teehr packages
+    #---------------------------------------------
+    git+https://github.com/hydroshare/nbfetch.git@hspuller-auth \
+    dask_labextension \
+    hsfiles-jupyter \
+    #---------------------------------------------
+    # Ngen: calibration spotpy
+    #---------------------------------------------
+    spotpy \
+    # mpi4py \
+    # ipyparallel \
     #---------------------------------------------
     # 2i2c: To enable venv kernels in Jupyter
     #---------------------------------------------
     #ipykernel
+    #---------------------------------------------
+    # Misc:
+    #   - TEEHR: Download the required JAR files for Spark to interact with AWS S3.
+    #   - Link hsfiles-jupyter to JupyterLab
+    #---------------------------------------------
+    && uv run python -m teehr.utils.install_spark_jars \
+    && uv run python -m hsfiles_jupyter
 
-RUN rm -rf /tmp/*.whl
 RUN echo "/dmod/shared_libs/" >> /etc/ld.so.conf.d/ngen.conf && ldconfig -v
 
 # Upgrade colorama to resolve dependency conflict
@@ -193,10 +222,6 @@ RUN uv pip install --system --upgrade colorama
 # Install nb_black separately to address metadata generation issue
 RUN uv pip install --system --no-cache-dir nb_black==1.0.5
 
-# Install nbfetch for hydroshare compatible with pydantic1
-RUN uv pip install --system --no-cache-dir \
-    git+https://github.com/hydroshare/nbfetch.git@hspuller-auth \
-    dask_labextension
 # enable jupyter_server extension
 RUN jupyter server extension enable --py nbfetch --sys-prefix
 
@@ -210,17 +235,35 @@ RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/s
 # specific version of numpy.
 # In order for ngen to work with 2i2c and hydroshare packages, conflicting packages
 # are installed in a venv which will be referenced by the PyNGIAB package
+#
+# WARN: Everything installed after this using `uv` will be installed in the venv
 ##########
 RUN uv venv --system-site-packages \
-    && uv pip install --no-cache-dir 'pydantic<2' \
-    numpy==$(/dmod/bin/ngen --info | grep -e 'NumPy Version: ' | cut -d ':' -f 2 | uniq | xargs) \
-    # && uv pip install --system --no-cache-dir 'pydantic<2' \
+    # To avoid issues with installing lstm from seperate pip index
+    && uv pip install --no-cache-dir \
+          /ngen/ngen/extern/lstm --extra-index-url https://download.pytorch.org/whl/cpu \
+    && uv pip install --no-cache-dir \
+    /tmp/*.whl \
+    #netCDF4==1.6.3 \
+    'netCDF4>=1.6.5' \
+    numpy==$(/dmod/bin/ngen --info | grep -m 1 -e 'NumPy Version: ' | cut -d ':' -f 2 | uniq | xargs) \
+    'pydantic<2' \
+    #---------------------------------------------
+    # Ngen: calibration ngen-cal
+    #---------------------------------------------
+    "git+https://github.com/noaa-owp/ngen-cal@master#egg=ngen_cal&subdirectory=python/ngen_cal" \
     #---------------------------------------------
     # Setup and install ngiab_data_preprocess module to allow preparing data for ngiab
-    # Download hydrofabric and update permissions to make '.ngiab' available to non-root user
+    #   - [Optional] Download default hydrofabric for ngiab_data_preprocess
     #---------------------------------------------
-    ngiab_data_preprocess==4.2.*
-    # && uv run python -c "from data_sources.source_validation import download_and_update_hf; download_and_update_hf();"
+    ngiab_data_preprocess==4.2.* \
+    #&& uv run python -c "from data_sources.source_validation import download_and_update_hf; \
+    #			 download_and_update_hf();" \
+    && rm -rf /tmp/*.whl
+
+# [LSTM-Update] Replace the noaa-owp example weights with jmframes
+RUN rm -rf /ngen/ngen/extern/lstm/trained_neuralhydrology_models
+COPY --from=lstm_weights /lstm_weights/trained_neuralhydrology_models /ngen/ngen/extern/lstm/trained_neuralhydrology_models
 
 # Make this venv available as JupyterHub kernel
 # ENV PATH=/ngen/.venv/bin:$PATH
@@ -230,36 +273,14 @@ RUN uv venv --system-site-packages \
 # To avoid error for ngen-parallel
 ENV RDMAV_FORK_SAFE=1
 
-
-# ##########
-# # Teehr (https://github.com/arpita0911patel/ngiab-teehr/tree/main)
-# ##########
-# WORKDIR /ngen/teehr
-
-# RUN apt-get update && apt-get install -y git openjdk-11-jdk
-
-# ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-# ENV PATH=$PATH:$JAVA_HOME/bin
-
-# RUN git clone https://github.com/arpita0911patel/ngiab-teehr.git
-
-# RUN pip install uv
-# RUN uv pip install --system --no-cache-dir -r ngiab-teehr/requirements.txt
-
-# RUN cp -r ngiab-teehr/scripts/* . \
-#     && rm -r ngiab-teehr
-
 ##########
 # PyNGIAB (https://github.com/fbaig/ciroh_pyngiab)
 ##########
-
 RUN pip install git+https://github.com/fbaig/ciroh_pyngiab.git
 
-WORKDIR /ngen/
-USER ${NB_USER}
 COPY ./tests /tests
 
-USER root
+#USER root
 # Update permissions to allow Jupyter non-root user to install and use packages
 RUN chown -R ${NB_USER}:${NB_USER} \
     /home/jovyan/ \
@@ -269,6 +290,7 @@ RUN chown -R ${NB_USER}:${NB_USER} \
     && chmod +x /tests/test-entrypoint.sh
 
 USER ${NB_USER}
+WORKDIR /ngen/
 RUN echo "export PS1='\u\[\033[01;32m\]@ngiab_dev\[\033[00m\]:\[\033[01;35m\]\W\[\033[00m\]\$ '" >> ~/.bashrc
 # # Download hydrofabric when starting container
 # ENTRYPOINT uv run python -c "from data_sources.source_validation import download_and_update_hf; download_and_update_hf();"
