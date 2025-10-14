@@ -65,4 +65,4 @@ This workflow posts a comment inside a pull request, every time a pull request g
 
 #### 4. Create a PR into ngen-2i2c branch
 
-#### 5. Once the PR is merged, bump the image tag and build new image new tag.
+#### 5. Once the PR is merged, bump the image tag and build new image with new tag.
