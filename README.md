@@ -55,7 +55,7 @@ This workflow posts a comment inside a pull request, every time a pull request g
 
 ![Test this PR on Binder](images/binder-badge.png)
 
-## NextGen National Water Model(NWM) Image update
+## NextGen National Water Model (NWM) Image update
 
 #### 1. Create a feature branch off ngen-2i2c
 
