@@ -2,16 +2,17 @@ name: Build and Push Comm Nextgen
 
 on:
   push:
-    branches: 
+    branches:
       - ngen-2i2c
-    tags: [ 'v*' ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ ngen-2i2c ]
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
     inputs:
       tag:
-        description: 'Custom tag to apply (optional)'
-        required: false
+        description: 'Tag to build (example: v1.1.1)'
+        required: true
         default: 'manual'
 
 env:
@@ -22,45 +23,59 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Login to Quay.io
-      uses: docker/login-action@v3
-      with:
-        registry: quay.io
-        username: ${{ secrets.QUAY_CIROH_USERNAME }}
-        password: ${{ secrets.QUAY_CIROH_PASSWORD }}
+      - name: Login to Quay.io
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_CIROH_USERNAME }}
+          password: ${{ secrets.QUAY_CIROH_PASSWORD }}
 
-    - name: Extract metadata (tags, labels) for Docker
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: quay.io/${{ env.QUAY_ORG }}/${{ env.IMAGE_NAME }}
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{major}}
-          type=sha
-          ${{ github.event_name == 'workflow_dispatch' && format('type=raw,value={0}', inputs.tag) || '' }}
-    - name: Free disk space
-      run: |
-        sudo rm -rf /usr/local/lib/android
-        sudo rm -rf /usr/share/dotnet
-        sudo rm -rf /opt/ghc
-        docker system prune -af
-    - name: Build and push
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+      - name: Determine tag
+        id: tag
+        run: |
+          # 1. Manual trigger tag
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "value=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # 2. Git tag push → v1.1.1
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "value=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # 3. Branch push → branch name (ngen-2i2c)
+          if [[ "${GITHUB_REF}" == refs/heads/* ]]; then
+            echo "value=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # 4. Pull request → use source branch name
+          echo "value=${{ github.head_ref }}" >> $GITHUB_OUTPUT
+
+      - name: Debug tag
+        run: echo "Image tag: ${{ steps.tag.outputs.value }}"
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          docker system prune -af
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: quay.io/${{ env.QUAY_ORG }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.value }}
