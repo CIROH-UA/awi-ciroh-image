@@ -65,7 +65,8 @@ jobs:
           echo "value=${{ github.head_ref }}" >> "$GITHUB_OUTPUT"
 
       - name: Debug tag
-        run: echo "Image tag: ${{ steps.tag.outputs.value }}"
+        run: |
+          echo "Image tag: ${{ steps.tag.outputs.value }}"
 
       - name: Free disk space
         run: |
