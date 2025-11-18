@@ -7,7 +7,8 @@ on:
     tags:
       - 'v*'
   pull_request:
-    branches: [ ngen-2i2c ]
+    branches:
+      - ngen-2i2c
   workflow_dispatch:
     inputs:
       tag:
@@ -42,26 +43,26 @@ jobs:
       - name: Determine tag
         id: tag
         run: |
-          # 1. Manual trigger tag
+          # Manual workflow input
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "value=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+            echo "value=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # 2. Git tag push → v1.1.1
+          # Git tag push (refs/tags/v1.1.1 → v1.1.1)
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            echo "value=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+            echo "value=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # 3. Branch push → branch name (ngen-2i2c)
+          # Branch push (refs/heads/ngen-2i2c → ngen-2i2c)
           if [[ "${GITHUB_REF}" == refs/heads/* ]]; then
-            echo "value=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+            echo "value=${GITHUB_REF#refs/heads/}" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # 4. Pull request → use source branch name
-          echo "value=${{ github.head_ref }}" >> $GITHUB_OUTPUT
+          # Pull request → use source branch name
+          echo "value=${{ github.head_ref }}" >> "$GITHUB_OUTPUT"
 
       - name: Debug tag
         run: echo "Image tag: ${{ steps.tag.outputs.value }}"
