@@ -83,7 +83,7 @@ RUN pip install hsclient[all]==1.1.6 \
 		pydantic==2.7.*
 
 RUN pip install -U --no-cache-dir --upgrade-strategy only-if-needed \
-    git+https://github.com/hydroshare/nbfetch.git@v0.6.3 \
+    git+https://github.com/hydroshare/nbfetch.git@v0.6.4 \
  && jupyter server extension enable --py nbfetch --sys-prefix
 
 # Install google cloud bigquery
