@@ -170,7 +170,7 @@ RUN pip3 install uv && \
     uv pip install --system --no-cache-dir \
     numpy==$(/dmod/bin/ngen --info | grep -m 1 -e 'NumPy Version: ' | cut -d ':' -f 2 | uniq | xargs) \
     jupyterlab_vim \
-    teehr==0.4.* \
+    teehr==0.5.* \
     git-lfs==1.6 \
     #---------------------------------------------
     # 2i2c: Install GIS packages
@@ -211,7 +211,7 @@ RUN pip3 install uv && \
     #   - TEEHR: Download the required JAR files for Spark to interact with AWS S3.
     #   - Link hsfiles-jupyter to JupyterLab
     #---------------------------------------------
-    && uv run python -m teehr.utils.install_spark_jars \
+    #&& uv run python -m teehr.utils.install_spark_jars \
     && uv run python -m hsfiles_jupyter
 
 RUN echo "/dmod/shared_libs/" >> /etc/ld.so.conf.d/ngen.conf && ldconfig -v
