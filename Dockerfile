@@ -11,7 +11,7 @@ ENV PATH ${NB_PYTHON_PREFIX}/bin:$PATH
 
 # Needed for apt-key to work
 RUN apt-get update -qq --yes > /dev/null && \
-    apt-get install --yes -qq gnupg2 > /dev/null && \
+    apt-get install --yes -qq gnupg2 software-properties-common > /dev/null && \
     rm -rf /var/lib/apt/lists/*
 
 # Install desktop environment packages
@@ -107,33 +107,19 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # ============================================================================
-# Install GCC 12.3 and gfortran 12.3 from source
+# Install GCC 12 and gfortran 12 from Ubuntu toolchain PPA
 # ============================================================================
-WORKDIR /tmp
-RUN wget https://ftp.gnu.org/gnu/gcc/gcc-12.3.0/gcc-12.3.0.tar.gz && \
-    tar -xzf gcc-12.3.0.tar.gz && \
-    cd gcc-12.3.0 && \
-    contrib/download_prerequisites && \
-    mkdir build && cd build && \
-    ../configure \
-        --prefix=/usr/local/gcc-12.3 \
-        --enable-languages=c,c++,fortran \
-        --disable-multilib \
-        --disable-bootstrap && \
-    make -j$(nproc) && \
-    make install && \
-    cd /tmp && rm -rf gcc-12.3.0*
-
-# Update alternatives to use GCC 12.3
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/local/gcc-12.3/bin/gcc 100 && \
-    update-alternatives --install /usr/bin/g++ g++ /usr/local/gcc-12.3/bin/g++ 100 && \
-    update-alternatives --install /usr/bin/gfortran gfortran /usr/local/gcc-12.3/bin/gfortran 100
-
-ENV PATH="/usr/local/gcc-12.3/bin:${PATH}"
-ENV LD_LIBRARY_PATH="/usr/local/gcc-12.3/lib64:${LD_LIBRARY_PATH}"
+RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
+    apt-get update && \
+    apt-get install -y gcc-12 g++-12 gfortran-12 && \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 100 \
+        --slave /usr/bin/g++ g++ /usr/bin/g++-12 \
+        --slave /usr/bin/gfortran gfortran /usr/bin/gfortran-12 \
+        --slave /usr/bin/gcov gcov /usr/bin/gcov-12 && \
+    rm -rf /var/lib/apt/lists/*
 
 # ============================================================================
-# Install OpenMPI 4.1.6
+# Install OpenMPI 4.1.6 from source
 # ============================================================================
 WORKDIR /tmp
 RUN wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.6.tar.gz && \
@@ -141,9 +127,9 @@ RUN wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.6.tar.g
     cd openmpi-4.1.6 && \
     ./configure \
         --prefix=/usr/local/openmpi-4.1.6 \
-        CC=/usr/local/gcc-12.3/bin/gcc \
-        CXX=/usr/local/gcc-12.3/bin/g++ \
-        FC=/usr/local/gcc-12.3/bin/gfortran && \
+        CC=gcc-12 \
+        CXX=g++-12 \
+        FC=gfortran-12 && \
     make -j$(nproc) && \
     make install && \
     cd /tmp && rm -rf openmpi-4.1.6*
@@ -181,16 +167,20 @@ RUN wget https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.9.2.tar.gz && 
     mkdir build && cd build && \
     cmake .. \
         -DCMAKE_INSTALL_PREFIX=/usr/local/netcdf-4.9.2 \
-        -DCMAKE_C_COMPILER=/usr/local/gcc-12.3/bin/gcc \
+        -DCMAKE_C_COMPILER=gcc-12 \
         -DENABLE_NETCDF_4=ON \
         -DENABLE_DAP=ON \
-        -DHDF5_DIR=/usr/local/hdf5-1.14.3 && \
+        -DHDF5_DIR=/usr/local/hdf5-1.14.3 \
+        -DHDF5_C_LIBRARY=/usr/local/hdf5-1.14.3/lib/libhdf5.so \
+        -DHDF5_HL_LIBRARY=/usr/local/hdf5-1.14.3/lib/libhdf5_hl.so \
+        -DHDF5_INCLUDE_DIR=/usr/local/hdf5-1.14.3/include && \
     make -j$(nproc) && \
     make install && \
-    cd /tmp && rm -rf netcdf-c-4.9.2*
+    cd /tmp && rm -rf netcdf-c-4.9.2 v4.9.2.tar.gz
 
 ENV PATH="/usr/local/netcdf-4.9.2/bin:${PATH}"
 ENV LD_LIBRARY_PATH="/usr/local/netcdf-4.9.2/lib:${LD_LIBRARY_PATH}"
+ENV CPATH="/usr/local/netcdf-4.9.2/include:${CPATH}"
 
 # ============================================================================
 # Install NetCDF-Fortran 4.6.x
@@ -200,15 +190,19 @@ RUN wget https://github.com/Unidata/netcdf-fortran/archive/refs/tags/v4.6.1.tar.
     tar -xzf v4.6.1.tar.gz && \
     cd netcdf-fortran-4.6.1 && \
     mkdir build && cd build && \
+    export NCDIR=/usr/local/netcdf-4.9.2 && \
+    export NFDIR=/usr/local/netcdf-fortran-4.6.1 && \
+    export CPPFLAGS=-I${NCDIR}/include && \
+    export LDFLAGS=-L${NCDIR}/lib && \
     cmake .. \
-        -DCMAKE_INSTALL_PREFIX=/usr/local/netcdf-fortran-4.6.1 \
-        -DCMAKE_C_COMPILER=/usr/local/gcc-12.3/bin/gcc \
-        -DCMAKE_Fortran_COMPILER=/usr/local/gcc-12.3/bin/gfortran \
-        -DNETCDF_C_LIBRARY=/usr/local/netcdf-4.9.2/lib/libnetcdf.so \
-        -DNETCDF_INCLUDE_DIR=/usr/local/netcdf-4.9.2/include && \
+        -DCMAKE_INSTALL_PREFIX=${NFDIR} \
+        -DCMAKE_C_COMPILER=gcc-12 \
+        -DCMAKE_Fortran_COMPILER=gfortran-12 \
+        -DNETCDF_C_LIBRARY=${NCDIR}/lib/libnetcdf.so \
+        -DNETCDF_INCLUDE_DIR=${NCDIR}/include && \
     make -j$(nproc) && \
     make install && \
-    cd /tmp && rm -rf netcdf-fortran-4.6.1*
+    cd /tmp && rm -rf netcdf-fortran-4.6.1 v4.6.1.tar.gz
 
 ENV PATH="/usr/local/netcdf-fortran-4.6.1/bin:${PATH}"
 ENV LD_LIBRARY_PATH="/usr/local/netcdf-fortran-4.6.1/lib:${LD_LIBRARY_PATH}"
@@ -223,8 +217,8 @@ RUN wget https://github.com/OSGeo/gdal/releases/download/v3.9.4/gdal-3.9.4.tar.g
     mkdir build && cd build && \
     cmake .. \
         -DCMAKE_INSTALL_PREFIX=/usr/local/gdal-3.9.4 \
-        -DCMAKE_C_COMPILER=/usr/local/gcc-12.3/bin/gcc \
-        -DCMAKE_CXX_COMPILER=/usr/local/gcc-12.3/bin/g++ \
+        -DCMAKE_C_COMPILER=gcc-12 \
+        -DCMAKE_CXX_COMPILER=g++-12 \
         -DBUILD_PYTHON_BINDINGS=ON \
         -DPython_EXECUTABLE=$(which python3) && \
     make -j$(nproc) && \
@@ -234,38 +228,39 @@ RUN wget https://github.com/OSGeo/gdal/releases/download/v3.9.4/gdal-3.9.4.tar.g
 ENV PATH="/usr/local/gdal-3.9.4/bin:${PATH}"
 ENV LD_LIBRARY_PATH="/usr/local/gdal-3.9.4/lib:${LD_LIBRARY_PATH}"
 ENV GDAL_DATA="/usr/local/gdal-3.9.4/share/gdal"
-ENV PYTHONPATH="/usr/local/gdal-3.9.4/lib/python3/dist-packages:${PYTHONPATH}"
 
-# Install GDAL Python bindings via pip as well
-RUN pip install GDAL==3.9.4
+# Install GDAL Python bindings via pip
+RUN pip install --no-cache-dir GDAL==3.9.4 --no-binary GDAL \
+    --global-option=build_ext \
+    --global-option="-I/usr/local/gdal-3.9.4/include" \
+    --global-option="-L/usr/local/gdal-3.9.4/lib" || \
+    pip install --no-cache-dir GDAL==3.9.4
 
 # ============================================================================
 # Install R 4.5.x
 # ============================================================================
-WORKDIR /tmp
-RUN apt-get update && \
-    apt-get install -y software-properties-common dirmngr && \
-    wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc && \
+RUN wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc && \
     add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/" && \
     apt-get update && \
-    apt-get install -y r-base=4.5.* r-base-dev=4.5.* && \
+    apt-get install -y r-base r-base-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# Alternative: Build R 4.5.0 from source if the repository doesn't have it
-# WORKDIR /tmp
-# RUN wget https://cran.r-project.org/src/base/R-4/R-4.5.0.tar.gz && \
-#     tar -xzf R-4.5.0.tar.gz && \
-#     cd R-4.5.0 && \
-#     ./configure \
-#         --prefix=/usr/local/R-4.5.0 \
-#         --enable-R-shlib \
-#         --with-blas \
-#         --with-lapack && \
-#     make -j$(nproc) && \
-#     make install && \
-#     ln -s /usr/local/R-4.5.0/bin/R /usr/local/bin/R && \
-#     ln -s /usr/local/R-4.5.0/bin/Rscript /usr/local/bin/Rscript && \
-#     cd /tmp && rm -rf R-4.5.0*
+# If R 4.5 is not available, build from source
+WORKDIR /tmp
+RUN R_VERSION=$(R --version | head -1 | grep -oP '\d+\.\d+\.\d+') && \
+    if [ "$(echo "$R_VERSION < 4.4" | bc -l)" -eq 1 ]; then \
+        wget https://cran.r-project.org/src/base/R-4/R-4.5.0.tar.gz && \
+        tar -xzf R-4.5.0.tar.gz && \
+        cd R-4.5.0 && \
+        ./configure \
+            --prefix=/usr/local \
+            --enable-R-shlib \
+            --with-blas \
+            --with-lapack && \
+        make -j$(nproc) && \
+        make install && \
+        cd /tmp && rm -rf R-4.5.0*; \
+    fi
 
 # ============================================================================
 # Install CDO 2.2.x
@@ -278,8 +273,10 @@ RUN wget https://code.mpimet.mpg.de/attachments/download/29449/cdo-2.2.2.tar.gz 
         --prefix=/usr/local/cdo-2.2.2 \
         --with-netcdf=/usr/local/netcdf-4.9.2 \
         --with-hdf5=/usr/local/hdf5-1.14.3 \
-        CC=/usr/local/gcc-12.3/bin/gcc \
-        CXX=/usr/local/gcc-12.3/bin/g++ && \
+        CC=gcc-12 \
+        CXX=g++-12 \
+        CPPFLAGS="-I/usr/local/netcdf-4.9.2/include -I/usr/local/hdf5-1.14.3/include" \
+        LDFLAGS="-L/usr/local/netcdf-4.9.2/lib -L/usr/local/hdf5-1.14.3/lib" && \
     make -j$(nproc) && \
     make install && \
     cd /tmp && rm -rf cdo-2.2.2*
@@ -289,9 +286,9 @@ ENV PATH="/usr/local/cdo-2.2.2/bin:${PATH}"
 # ============================================================================
 # Set compiler environment variables for SYMFLUENCE
 # ============================================================================
-ENV CC=/usr/local/gcc-12.3/bin/gcc
-ENV CXX=/usr/local/gcc-12.3/bin/g++
-ENV FC=/usr/local/gcc-12.3/bin/gfortran
+ENV CC=gcc-12
+ENV CXX=g++-12
+ENV FC=gfortran-12
 ENV MPICC=/usr/local/openmpi-4.1.6/bin/mpicc
 ENV MPICXX=/usr/local/openmpi-4.1.6/bin/mpicxx
 ENV MPIFC=/usr/local/openmpi-4.1.6/bin/mpif90
@@ -299,42 +296,39 @@ ENV MPIFC=/usr/local/openmpi-4.1.6/bin/mpif90
 # ============================================================================
 # Install SYMFLUENCE
 # ============================================================================
-# Create directory for SYMFLUENCE
 RUN mkdir -p /opt/symfluence
 WORKDIR /opt/symfluence
 
 # Clone SYMFLUENCE repository
-# Note: Replace with actual SYMFLUENCE repository URL
+# Replace with actual repository URL
 RUN git clone https://github.com/your-org/symfluence.git . || \
     echo "WARNING: SYMFLUENCE repository URL needs to be updated"
 
-# Create Python virtual environment for SYMFLUENCE
+# Create Python virtual environment
 RUN python3 -m venv /opt/symfluence/.venv
 
-# Install SYMFLUENCE Python dependencies
+# Install SYMFLUENCE dependencies
 RUN if [ -f requirements.txt ]; then \
         /opt/symfluence/.venv/bin/pip install --upgrade pip && \
         /opt/symfluence/.venv/bin/pip install -r requirements.txt; \
     fi
 
-# Run SYMFLUENCE installer if available
+# Run installer
 RUN if [ -f ./symfluence ]; then \
         chmod +x ./symfluence && \
-        ./symfluence --install; \
+        ./symfluence --install || true; \
     fi
 
-# Add SYMFLUENCE to PATH
 ENV PATH="/opt/symfluence/.venv/bin:/opt/symfluence:${PATH}"
 
 # ============================================================================
-# END SYMFLUENCE INSTALLATION
+# Cleanup and finalize
 # ============================================================================
+WORKDIR /tmp
+RUN ldconfig
 
 # Update custom Jupyter Lab settings
-RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
+RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json 2>/dev/null || true
 
-# Switch back to notebook user
 USER ${NB_USER}
-
-# Set working directory back to home
 WORKDIR /home/${NB_USER}
