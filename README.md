@@ -54,3 +54,15 @@ This workflow is triggerd by every Pull Request commit and it **builds** the ima
 This workflow posts a comment inside a pull request, every time a pull request gets opened. The comment contains a "Test this PR on Binder" badge, which can be used to access the image defined by the PR in [mybinder.org](https://mybinder.org/).
 
 ![Test this PR on Binder](images/binder-badge.png)
+
+## NextGen National Water Model (NWM) Image update
+
+#### 1. Create a feature branch off ngen-2i2c
+
+#### 2. Make changes on the feature branch
+
+#### 3. Build and test feature branch
+
+#### 4. Create a PR into ngen-2i2c branch
+
+#### 5. Once the PR is merged, bump the image tag and build new image with new tag.
