@@ -55,13 +55,21 @@ RUN pip install jupyterlab_vim
 # TO download the folder/files:
 RUN pip install jupyter-tree-download
 
-# Install Google Cloud SDK (gcloud, gsutil)
+# Install Google Cloud SDK (gcloud, gsutil) and s3fs-fuse with FUSE support
 RUN apt-get update && \
-    apt-get install -y curl gnupg && \
+    apt-get install -y curl gnupg s3fs fuse3 && \
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
     apt-get update -y && \
     apt-get install google-cloud-sdk -y
+
+# Configure FUSE for s3fs - optimized for multi-user JupyterHub environment
+RUN echo 'user_allow_other' >> /etc/fuse.conf && \
+    chmod 644 /etc/fuse.conf
+
+# Add user to fuse group to allow FUSE mounting
+RUN groupadd -f fuse && \
+    usermod -a -G fuse ${NB_USER}
 
 # Install packages: spatialpandas, easydev, colormap, colorcet, duckdb, dask_geopandas, hydrotools, sidecar
 RUN pip install --no-cache-dir dask==2025.12.0 distributed==2025.12.0 spatialpandas easydev colormap colorcet duckdb dask_geopandas hydrotools sidecar
