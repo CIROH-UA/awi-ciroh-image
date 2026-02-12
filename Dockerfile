@@ -61,7 +61,7 @@ RUN apt-get update && \
     apt-get install google-cloud-sdk -y
 
 # Install various Python packages
-RUN pip install spatialpandas easydev colormap colorcet duckdb dask_geopandas hydrotools sidecar && \
+RUN pip install --no-cache-dir dask==2025.12.0 distributed==2025.12.0 spatialpandas easydev colormap colorcet duckdb dask_geopandas hydrotools sidecar && \
     pip install --upgrade colorama && \
     pip install nb_black==1.0.5
 
