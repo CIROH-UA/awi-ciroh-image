@@ -175,6 +175,7 @@ RUN pip3 install uv && \
     #---------------------------------------------
     # 2i2c: Install GIS packages
     #---------------------------------------------
+    dask==2025.12.0 distributed==2025.12.0 \
     spatialpandas \
     easydev \
     colormap \
