@@ -28,6 +28,7 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
         DOCKER_REGISTRY: "quay.io"
         IMAGE_NAME: "2i2c/awi-ciroh-image"
+        ADDITIONAL_TAG: 'taudem'
 
     # Lets us monitor disks getting full as images get bigger over time
     - name: Show how much disk space is left

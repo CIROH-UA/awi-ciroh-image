@@ -63,6 +63,52 @@ RUN apt-get update && \
     apt-get update -y && \
     apt-get install google-cloud-sdk -y
 
+# Install necessary dependencies to compile TauDEM
+RUN apt update && apt install -y \
+    build-essential \
+    cmake \
+    openmpi-bin \
+    libopenmpi-dev \
+    gdal-bin \
+    libgdal-dev \
+    libproj-dev \
+    libtiff-dev \
+    libgeotiff-dev \
+    git \
+    nano \
+    sudo \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create workspace directory for TauDEM
+RUN mkdir -p /root/workspace
+
+# Set working directory for TauDEM
+WORKDIR /root/workspace
+
+# Clone the TauDEM repository (for now using the vscode-macos-dev-setup branch)
+# TODO: Change this back to main branch when ready
+RUN git clone -b vscode-macos-dev-setup --single-branch https://github.com/dtarb/TauDEM.git
+
+# Set working directory to TauDEM
+WORKDIR /root/workspace/TauDEM
+
+# Set MPI environment variables
+ENV OMPI_MCA_plm_rsh_agent=/bin/false \
+    OMPI_MCA_btl_vader_single_copy_mechanism=none
+
+# Build and install TauDEM
+RUN export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin && \
+    make clean && \
+    make dk-release COMPILER=linux && \
+    make dk-install PREFIX=/usr/local && \
+    echo "=== Validating installation ===" && \
+    test -f /usr/local/taudem/pitremove || (echo "ERROR: pitremove not found in /usr/local/taudem" && exit 1) && \
+    echo "SUCCESS: TauDEM installation validated - pitremove found"
+
+# Set the PATH environment variable globally to include taudem directory
+ENV PATH="/usr/local/taudem:${PATH}"
+
 # Install packages: spatialpandas, easydev, colormap, colorcet, duckdb, dask_geopandas, hydrotools, sidecar
 RUN pip install --no-cache-dir dask==2025.12.0 distributed==2025.12.0 spatialpandas easydev colormap colorcet duckdb dask_geopandas hydrotools sidecar
 
