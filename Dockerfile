@@ -118,7 +118,7 @@ ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 
 # Install SYMFLUENCE into the shared conda environment so it is available to all users
-RUN uv pip install symfluence
+RUN pip install symfluence
 
 # Install external model binaries (SUMMA, mizuRoute, FUSE, NGEN, TauDEM, etc.)
 RUN symfluence binary install
