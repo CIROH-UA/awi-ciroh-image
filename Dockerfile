@@ -79,7 +79,8 @@ RUN pip install google-cloud-bigquery dataretrieval hsfiles-jupyter && \
 # SYMFLUENCE INSTALLATION SECTION
 # ============================================================================
 
-# Install SYMFLUENCE prerequisites - build toolchain and core libraries
+# Install SYMFLUENCE system dependencies
+# libproj-dev and libgeos-dev are required per SYMFLUENCE docs
 RUN apt-get update && \
     apt-get install -y \
     gcc \
@@ -97,6 +98,8 @@ RUN apt-get update && \
     libblas-dev \
     liblapack-dev \
     libopenblas-dev \
+    libproj-dev \
+    libgeos-dev \
     cdo \
     r-base \
     r-base-dev \
@@ -104,43 +107,24 @@ RUN apt-get update && \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Set compiler environment variables for SYMFLUENCE
+# Set compiler and GDAL include path environment variables
 ENV CC=gcc
 ENV CXX=g++
 ENV FC=gfortran
 ENV MPICC=mpicc
 ENV MPICXX=mpicxx
 ENV MPIFC=mpif90
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
 
-# Create directory for SYMFLUENCE
-RUN mkdir -p /opt/symfluence
-WORKDIR /opt/symfluence
+# Install SYMFLUENCE into the shared conda environment so it is available to all users
+RUN uv pip install symfluence
 
-# Clone SYMFLUENCE repository (adjust URL to actual repo)
-# Note: Replace with actual SYMFLUENCE repository URL
-RUN git clone https://github.com/your-org/symfluence.git . || \
-    echo "WARNING: SYMFLUENCE repository URL needs to be updated"
+# Install external model binaries (SUMMA, mizuRoute, FUSE, NGEN, TauDEM, etc.)
+RUN symfluence binary install
 
-# Create Python virtual environment for SYMFLUENCE
-# Using Python 3.11 as specified in requirements
-RUN python3.11 -m venv /opt/symfluence/.venv || \
-    python3 -m venv /opt/symfluence/.venv
-
-# Install SYMFLUENCE Python dependencies
-# If symfluence has a requirements.txt, this will install it
-RUN if [ -f requirements.txt ]; then \
-        /opt/symfluence/.venv/bin/pip install --upgrade pip && \
-        /opt/symfluence/.venv/bin/pip install -r requirements.txt; \
-    fi
-
-# Run SYMFLUENCE installer if available
-RUN if [ -f ./symfluence ]; then \
-        chmod +x ./symfluence && \
-        ./symfluence --install; \
-    fi
-
-# Add SYMFLUENCE to PATH
-ENV PATH="/opt/symfluence/.venv/bin:/opt/symfluence:${PATH}"
+# Register SYMFLUENCE as a Jupyter kernel available to all JupyterHub users
+RUN python -m ipykernel install --name "symfluence" --display-name "Python (SYMFLUENCE)" --sys-prefix
 
 # ============================================================================
 # END SYMFLUENCE INSTALLATION
