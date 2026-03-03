@@ -2,10 +2,10 @@ name: Build and push symfluence
 on:
   push:
     branches:
-      - symfluence
+      - symfluence-install
   pull_request:
     branches:
-      - symfluence
+      - symfluence-install
   workflow_dispatch:
     inputs:
       tag:
@@ -32,7 +32,7 @@ jobs:
         DOCKER_USERNAME: ${{ secrets.QUAY_CIROH_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.QUAY_CIROH_PASSWORD }}
         DOCKER_REGISTRY: "quay.io"
-        IMAGE_NAME: "awiciroh/symfluence"
+        IMAGE_NAME: "awiciroh/symfluence-install"
         ADDITIONAL_TAG: "v1.0.0"
 
     # Lets us monitor disks getting full as images get bigger over time
