@@ -33,10 +33,12 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
 
 # Install TurboVNC
 ARG TURBOVNC_VERSION=2.2.6
-RUN wget -q "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}/turbovnc_${TURBOVNC_VERSION}_amd64.deb/download" -O turbovnc.deb \
- && apt-get update -qq --yes > /dev/null \
- && apt-get install -y ./turbovnc.deb > /dev/null \
- && apt-get remove -y light-locker > /dev/null \
+RUN curl -fL "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}/turbovnc_${TURBOVNC_VERSION}_amd64.deb/download" -o turbovnc.deb \
+ && apt-get update -qq --yes \
+ && ls -lh turbovnc.deb \
+ && file turbovnc.deb \
+ && apt-get install -y ./turbovnc.deb \
+ && apt-get remove -y light-locker \
  && rm ./turbovnc.deb \
  && ln -s /opt/TurboVNC/bin/* /usr/local/bin/ \
  && rm -rf /var/lib/apt/lists/*
