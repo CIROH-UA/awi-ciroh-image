@@ -36,7 +36,6 @@ ARG TURBOVNC_VERSION=2.2.6
 RUN curl -fL "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION}/turbovnc_${TURBOVNC_VERSION}_amd64.deb/download" -o turbovnc.deb \
  && apt-get update -qq --yes \
  && ls -lh turbovnc.deb \
- && file turbovnc.deb \
  && apt-get install -y ./turbovnc.deb \
  && apt-get remove -y light-locker \
  && rm ./turbovnc.deb \

@@ -32,8 +32,8 @@ jobs:
         DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
         DOCKER_REGISTRY: "quay.io"
-        IMAGE_NAME: "2i2c/symfluence-install"
-        ADDITIONAL_TAG: "v1.0.0"
+        IMAGE_NAME: "2i2c/awi-ciroh-image"
+        ADDITIONAL_TAG: "symfluence"
 
     # Lets us monitor disks getting full as images get bigger over time
     - name: Show how much disk space is left
