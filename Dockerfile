@@ -118,6 +118,9 @@ ENV MPIFC=mpif90
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 
+# Fix NumPy 2.x incompatibility with pyarrow (required for symfluence)
+RUN conda install -n ${CONDA_ENV} -y "numpy<2" pandas pyarrow
+
 # Install SYMFLUENCE into the shared conda environment so it is available to all users
 # RUN pip install symfluence
 RUN pip install git+https://github.com/DarriEy/SYMFLUENCE.git@main
