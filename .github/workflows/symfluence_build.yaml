@@ -29,10 +29,10 @@ jobs:
       uses: jupyterhub/repo2docker-action@master
       with:
         # Make sure username & password/token pair matches your registry credentials
-        DOCKER_USERNAME: ${{ secrets.QUAY_CIROH_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.QUAY_CIROH_PASSWORD }}
+        DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
         DOCKER_REGISTRY: "quay.io"
-        IMAGE_NAME: "awiciroh/symfluence-install"
+        IMAGE_NAME: "2i2c/symfluence-install"
         ADDITIONAL_TAG: "v1.0.0"
 
     # Lets us monitor disks getting full as images get bigger over time
