@@ -123,7 +123,7 @@ ENV C_INCLUDE_PATH=/usr/include/gdal
 RUN pip install git+https://github.com/DarriEy/SYMFLUENCE.git@main
 
 # Fix NumPy 2.x incompatibility with pyarrow (required for symfluence)
-RUN conda install -n ${CONDA_ENV} -y "numpy<2" pandas pyarrow
+RUN pip install --force-reinstall 'numpy<2.0'
 
 # Install external model binaries (SUMMA, mizuRoute, FUSE, NGEN, TauDEM, etc.)
 RUN symfluence binary install
