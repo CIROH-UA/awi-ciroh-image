@@ -118,18 +118,31 @@ ENV MPIFC=mpif90
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 
-# Install SYMFLUENCE into the shared conda environment so it is available to all users
-# RUN pip install symfluence
-RUN pip install git+https://github.com/DarriEy/SYMFLUENCE.git@main
+# Pin SYMFLUENCE data/binary install to a fixed, world-readable path.
+# Without this, binary_service._resolve_default_data_dir() falls back to
+# a sibling of CWD at build time (unpredictable), and users at runtime
+# would have a different CWD so the binaries would never be found.
+ENV SYMFLUENCE_DATA_DIR=/opt/symfluence/data
+ENV SYMFLUENCE_CODE_DIR=/opt/symfluence
 
-# Fix NumPy 2.x incompatibility with pyarrow (required for symfluence)
-RUN pip install --force-reinstall 'numpy<2.0'
+RUN mkdir -p /opt/symfluence/data && chmod -R 755 /opt/symfluence
 
-# Install external model binaries (SUMMA, mizuRoute, FUSE, NGEN, TauDEM, etc.)
-RUN symfluence binary install
+# Create a dedicated conda env for SYMFLUENCE to avoid conflicts with the base env
+RUN mamba create -n symfluence -y python=3.11 ipykernel && \
+    /srv/conda/envs/symfluence/bin/pip install \
+        git+https://github.com/DarriEy/SYMFLUENCE.git@main
 
-# Register SYMFLUENCE as a Jupyter kernel available to all JupyterHub users
-RUN python -m ipykernel install --name "symfluence" --display-name "Python (SYMFLUENCE)" --sys-prefix
+# Register the SYMFLUENCE kernel into the notebook env's prefix so ALL
+# JupyterHub users see it — kernel spec points back to the symfluence env's Python
+RUN /srv/conda/envs/symfluence/bin/python -m ipykernel install \
+    --prefix=/srv/conda/envs/notebook \
+    --name "symfluence" \
+    --display-name "Python (SYMFLUENCE)"
+
+# Install external model binaries into $SYMFLUENCE_DATA_DIR (/opt/symfluence/data).
+# The ENV vars above are set image-wide, so all JupyterHub users resolve
+# the same path at runtime without needing to set anything themselves.
+RUN /srv/conda/envs/symfluence/bin/symfluence binary install
 
 # ============================================================================
 # END SYMFLUENCE INSTALLATION
