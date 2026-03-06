@@ -43,6 +43,10 @@ RUN curl -fL "https://sourceforge.net/projects/turbovnc/files/${TURBOVNC_VERSION
  && rm -rf /var/lib/apt/lists/*
 
 RUN mamba install -n ${CONDA_ENV} -y websockify
+# Keep compiled numeric stack conda-managed to avoid ABI conflicts (pyarrow vs numpy)
+# Stay on NumPy 1.x for compatibility with older compiled wheels.
+RUN mamba install -n ${CONDA_ENV} -y -c conda-forge \
+    "numpy<2" pandas pyarrow
 
 # Install jupyter-remote-desktop-proxy
 RUN export PATH=${NB_PYTHON_PREFIX}/bin:${PATH} \
@@ -62,7 +66,8 @@ RUN apt-get update && \
     apt-get install google-cloud-sdk -y
 
 # Install various Python packages
-RUN pip install --no-cache-dir dask==2025.12.0 distributed==2025.12.0 spatialpandas easydev colormap colorcet duckdb dask_geopandas hydrotools sidecar && \
+RUN pip install --no-cache-dir dask==2025.12.0 distributed==2025.12.0 spatialpandas easydev colorcet duckdb dask_geopandas hydrotools sidecar && \
+    pip install --no-cache-dir --no-deps colormap && \
     pip install --upgrade colorama && \
     pip install nb_black==1.0.5
 
@@ -76,6 +81,8 @@ RUN pip install hsclient[all]==1.1.6 pydantic==2.7.* && \
 RUN pip install google-cloud-bigquery dataretrieval hsfiles-jupyter && \
     python -m hsfiles_jupyter
 
+# TODO: The following line is a debugging statement that can be removed.
+RUN python -c "import numpy, pandas; import pyarrow; print('numpy', numpy.__version__); print('pandas', pandas.__version__); print('pyarrow', pyarrow.__version__)"
 # ============================================================================
 # SYMFLUENCE INSTALLATION SECTION
 # ============================================================================
