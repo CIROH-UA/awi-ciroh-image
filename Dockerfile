@@ -1,5 +1,5 @@
 # ============================================================================
-# STAGE 1: SYMFLUENCE builder
+# STAGE 1: SYMFLUENCE Builder
 # ============================================================================
 FROM pangeo/pangeo-notebook:2024.04.08 AS symfluence-builder
 
@@ -19,29 +19,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         cdo \
     && rm -rf /var/lib/apt/lists/*
 
-# Set SYMFLUENCE data path
+# Set SYMFLUENCE paths
 ENV SYMFLUENCE_DATA_DIR=/opt/symfluence/data
 ENV SYMFLUENCE_CODE_DIR=/opt/symfluence
 
 RUN mkdir -p /opt/symfluence/data && chmod -R 755 /opt/symfluence
 
-# Create isolated conda env for SYMFLUENCE
+# Create isolated conda environment for SYMFLUENCE
 RUN mamba create -n symfluence -y python=3.11 ipykernel
 
-# Install SYMFLUENCE and binaries
+# Install SYMFLUENCE Python package and binaries
 RUN /srv/conda/envs/symfluence/bin/pip install \
         git+https://github.com/DarriEy/SYMFLUENCE.git@main
 
 RUN /srv/conda/envs/symfluence/bin/symfluence binary install
 
-# Clean up conda caches & reduce environment size
+# Clean conda caches & remove unnecessary site-packages files
 RUN conda clean -afy && \
     find /srv/conda/envs/symfluence/lib/python3.11/site-packages/ -type d -name "tests" -exec rm -rf {} + && \
     find /srv/conda/envs/symfluence/lib/python3.11/site-packages/ -type d -name "doc" -exec rm -rf {} + && \
     find /srv/conda/envs/symfluence/lib/python3.11/site-packages/ -name "*.pyc" -delete
 
 # ============================================================================
-# STAGE 2: Final image
+# STAGE 2: Final Image
 # ============================================================================
 FROM pangeo/pangeo-notebook:2024.04.08
 
@@ -49,18 +49,18 @@ USER root
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PATH=/srv/conda/envs/symfluence/bin:$PATH
 
-# Install only runtime libraries needed for SYMFLUENCE
+# Install runtime libraries only
 RUN apt-get update && apt-get install -y --no-install-recommends \
         openmpi-bin \
         gdal-bin \
-        libhdf5-103 \
-        libnetcdf19 \
-        libproj25 \
-        libgeos-c1v5 \
+        libhdf5-dev \
+        libnetcdf-dev \
+        libproj-dev \
+        libgeos-dev \
         cdo \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy SYMFLUENCE conda environment & binaries from builder
+# Copy SYMFLUENCE environment & binaries from builder stage
 COPY --from=symfluence-builder /srv/conda/envs/symfluence \
      /srv/conda/envs/symfluence
 
