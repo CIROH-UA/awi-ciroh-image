@@ -134,7 +134,18 @@ RUN CMAKE_PREFIX_PATH="${SYMFLUENCE_ENV}${CMAKE_PREFIX_PATH:+:${CMAKE_PREFIX_PAT
     CMAKE_EXE_LINKER_FLAGS="${CMAKE_EXE_LINKER_FLAGS:+${CMAKE_EXE_LINKER_FLAGS} }-lexpat" \
     ${SYMFLUENCE_ENV}/bin/symfluence binary install
 
+RUN mamba install -n symfluence -y -c conda-forge \
+    netcdf4 \
+    h5py \
+    hdf5 \
+    h5netcdf \
+    gdal
+
 RUN conda clean -afy && mamba clean -afy
+
+# Local build validation. Remove before pushing if you do not want build-time
+# verification in the published Dockerfile.
+RUN ${SYMFLUENCE_ENV}/bin/python -c "import h5py, netCDF4, h5netcdf; from osgeo import gdal; print('symfluence env validation ok')"
 
 # ============================================================================
 # END SYMFLUENCE INSTALLATION
