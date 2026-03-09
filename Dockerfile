@@ -134,6 +134,12 @@ RUN CMAKE_PREFIX_PATH="${SYMFLUENCE_ENV}${CMAKE_PREFIX_PATH:+:${CMAKE_PREFIX_PAT
     CMAKE_EXE_LINKER_FLAGS="${CMAKE_EXE_LINKER_FLAGS:+${CMAKE_EXE_LINKER_FLAGS} }-lexpat" \
     ${SYMFLUENCE_ENV}/bin/symfluence binary install
 
+# Remove pip-installed HDF5/NetCDF bindings that symfluence may have pulled in.
+RUN ${SYMFLUENCE_ENV}/bin/pip uninstall -y \
+    h5py \
+    netCDF4 \
+    h5netcdf || true
+
 RUN mamba install -n symfluence -y -c conda-forge \
     netcdf4 \
     h5py \
