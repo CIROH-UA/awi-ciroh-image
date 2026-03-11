@@ -124,7 +124,8 @@ ENV Boost_NO_SYSTEM_PATHS=ON
 RUN ${SYMFLUENCE_ENV}/bin/python -m ipykernel install \
     --prefix=/srv/conda/envs/notebook \
     --name "symfluence" \
-    --display-name "Python (SYMFLUENCE)"
+    --display-name "Python (SYMFLUENCE)" && \
+    ${SYMFLUENCE_ENV}/bin/python -c 'import json; from pathlib import Path; kernel_path = Path("/srv/conda/envs/notebook/share/jupyter/kernels/symfluence/kernel.json"); kernel_spec = json.loads(kernel_path.read_text()); kernel_spec["env"] = {**kernel_spec.get("env", {}), "PATH": "/srv/conda/envs/symfluence/bin:${PATH}", "CONDA_PREFIX": "/srv/conda/envs/symfluence"}; kernel_path.write_text(json.dumps(kernel_spec, indent=2) + "\n")'
 
 RUN CMAKE_PREFIX_PATH="${SYMFLUENCE_ENV}${CMAKE_PREFIX_PATH:+:${CMAKE_PREFIX_PATH}}" \
     CPATH="${SYMFLUENCE_ENV}/include${CPATH:+:${CPATH}}" \
