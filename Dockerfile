@@ -257,6 +257,7 @@ RUN uv venv --system-site-packages \
     #   - [Optional] Download default hydrofabric for ngiab_data_preprocess
     #---------------------------------------------
     ngiab_data_preprocess==4.6.7 \
+    'pandas>=2.0,<3.0' \
     #&& uv run python -c "from data_sources.source_validation import download_and_update_hf; \
     #			 download_and_update_hf();" \
     && rm -rf /tmp/*.whl
