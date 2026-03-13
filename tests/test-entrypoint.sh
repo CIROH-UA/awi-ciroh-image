@@ -1,9 +1,12 @@
 #!/bin/bash
+set -eo pipefail
+
 /srv/conda/envs/notebook/bin/python /tests/tests.py -v 2>&1 | tee /tests/pyngiab_tests.log
 # No need to activate the venv since it is done automatically by PyNGIAB
 #source /ngen/.venv/bin/activate && /srv/conda/envs/notebook/bin/python /tests/tests.py -v
 
 # TEEHR(https://github.com/RTIInternational/teehr/) built-in tests
+# Note: TEEHR tests are non-blocking as they depend on external APIs/network
 cd /tests && \
     git init teehr \
     && cd teehr \
@@ -13,4 +16,4 @@ cd /tests && \
     && echo "tests/" >> .git/info/sparse-checkout \
     && git pull origin main
 # Tests need to be executed from a specific directory (Thanks to Matt from RTI for the help)
-cd /tests/teehr/ && /srv/conda/envs/notebook/bin/pytest tests/ 2>&1 | tee /tests/teehr_tests.log
+cd /tests/teehr/ && /srv/conda/envs/notebook/bin/pytest tests/ 2>&1 | tee /tests/teehr_tests.log || echo "WARNING: TEEHR tests failed (non-blocking)"
