@@ -80,4 +80,36 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
+          load: ${{ github.event_name == 'pull_request' }}
           tags: quay.io/${{ env.QUAY_ORG }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.value }}
+
+      - name: Run smoke tests
+        id: smoke-tests
+        if: github.event_name == 'pull_request'
+        timeout-minutes: 30
+        run: |
+          IMAGE="quay.io/${{ env.QUAY_ORG }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.value }}"
+          docker run --rm "$IMAGE" /tests/test-entrypoint.sh 2>&1 | tee /tmp/test-results.log
+          echo "result=pass" >> "$GITHUB_OUTPUT"
+
+      - name: Comment test results on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let log = '';
+            try {
+              log = fs.readFileSync('/tmp/test-results.log', 'utf8');
+            } catch (e) {
+              log = 'No test output captured.';
+            }
+            const passed = '${{ steps.smoke-tests.outcome }}' === 'success';
+            const status = passed ? 'PASSED: Smoke tests' : 'FAILED: Smoke tests';
+            const body = `## ${status}\n\n<details><summary>Test output</summary>\n\n\`\`\`\n${log.slice(-3000)}\n\`\`\`\n\n</details>`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body
+            });
