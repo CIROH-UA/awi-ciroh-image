@@ -133,6 +133,7 @@ RUN CMAKE_PREFIX_PATH="${SYMFLUENCE_ENV}${CMAKE_PREFIX_PATH:+:${CMAKE_PREFIX_PAT
     LD_LIBRARY_PATH="${SYMFLUENCE_ENV}/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}" \
     LDFLAGS="${LDFLAGS:+${LDFLAGS} }-lexpat" \
     CMAKE_EXE_LINKER_FLAGS="${CMAKE_EXE_LINKER_FLAGS:+${CMAKE_EXE_LINKER_FLAGS} }-lexpat" \
+    SYMFLUENCE_PYTHON="${SYMFLUENCE_ENV}/bin/python" \
     ${SYMFLUENCE_ENV}/bin/symfluence binary install
 
 # Remove pip-installed HDF5/NetCDF bindings that symfluence may have pulled in.
