@@ -161,6 +161,9 @@ RUN ${SYMFLUENCE_ENV}/bin/python -c "import h5py, netCDF4, h5netcdf; from osgeo 
 
 RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
 
+# This symlink is required for the SYMFLUENCE to find the binary tools (e.g. TauDEM) at runtime.
+RUN ln -s ${SYMFLUENCE_DATA_DIR}/installs /home/${NB_USER}/SYMFLUENCE_data
+
 USER ${NB_USER}
 
 WORKDIR /home/${NB_USER}
