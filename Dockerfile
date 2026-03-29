@@ -161,8 +161,14 @@ RUN ${SYMFLUENCE_ENV}/bin/python -c "import h5py, netCDF4, h5netcdf; from osgeo 
 
 RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/share/jupyter/labextensions/@axlair/jupyterlab_vim/schemas/@axlair/jupyterlab_vim/plugin.json
 
-# This symlink is required for the SYMFLUENCE to find the binary tools (e.g. TauDEM) at runtime.
-RUN ln -sfn ${SYMFLUENCE_DATA_DIR}/installs /home/${NB_USER}/SYMFLUENCE_data/installs
+# This symlink must be created at runtime because /home/${NB_USER} is a
+# mounted volume in Kubernetes and any build-time writes to it are shadowed.
+# Scripts placed in before-notebook.d/ are sourced by start-notebook.sh
+# before the Jupyter server starts.
+RUN printf '#!/bin/bash\nmkdir -p /home/${NB_USER}/SYMFLUENCE_data\nln -sfn %s/installs /home/${NB_USER}/SYMFLUENCE_data/installs\n' \
+    "${SYMFLUENCE_DATA_DIR}" \
+    > /usr/local/bin/before-notebook.d/50-symfluence-symlink.sh && \
+    chmod +x /usr/local/bin/before-notebook.d/50-symfluence-symlink.sh
 
 USER ${NB_USER}
 
