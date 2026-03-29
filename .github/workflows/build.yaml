@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - install-marimo-extension
 
 jobs:
   build-and-push:
