@@ -101,4 +101,11 @@ RUN pip install hsfiles-jupyter
 # Link hsfiles-jupyter to JupyterLab
 RUN python -m hsfiles_jupyter
 
+# Install marimo: reactive Python notebook environment
+# - marimo: installed in user's environment (access to user's packages)
+# - marimo-jupyter-extension: installed in Jupyter's environment (required for JupyterLab launcher integration)
+# See: https://docs.marimo.io/guides/deploying/jupyterhub/#installation
+RUN pip install marimo
+RUN pip install marimo-jupyter-extension
+
 USER ${NB_USER}
