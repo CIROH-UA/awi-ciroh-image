@@ -165,7 +165,8 @@ RUN sed -i 's/\"default\": true/\"default\": false/g' /srv/conda/envs/notebook/s
 # mounted volume in Kubernetes and any build-time writes to it are shadowed.
 # Scripts placed in before-notebook.d/ are sourced by start-notebook.sh
 # before the Jupyter server starts.
-RUN printf '#!/bin/bash\nmkdir -p /home/${NB_USER}/SYMFLUENCE_data\nln -sfn %s/installs /home/${NB_USER}/SYMFLUENCE_data/installs\n' \
+RUN mkdir -p /usr/local/bin/before-notebook.d && \
+    printf '#!/bin/bash\nmkdir -p /home/${NB_USER}/SYMFLUENCE_data\nln -sfn %s/installs /home/${NB_USER}/SYMFLUENCE_data/installs\n' \
     "${SYMFLUENCE_DATA_DIR}" \
     > /usr/local/bin/before-notebook.d/50-symfluence-symlink.sh && \
     chmod +x /usr/local/bin/before-notebook.d/50-symfluence-symlink.sh
