@@ -102,6 +102,15 @@ RUN git clone --depth=1 --branch example_weights https://github.com/ciroh-ua/lst
 RUN shopt -s globstar
 RUN sed -i 's|\.\.|/ngen/ngen/extern/lstm|g' /lstm_weights/trained_neuralhydrology_models/**/config.yml
 
+# Use ubuntu as the base to avoid all the conda pollution
+FROM ubuntu:22.04 AS rust_install
+RUN apt-get update && apt-get install -y clang gcc cmake curl
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+RUN cargo install bmi-driver --no-default-features --features="fortran static"
+RUN apt-get install -y gfortran
+RUN cargo install rs_route --features static
+
 ###################################
 FROM pangeo/pangeo-notebook:2024.04.08 AS final
 
@@ -248,41 +257,21 @@ RUN uv venv --system-site-packages \
     'netCDF4>=1.6.5' \
     numpy==$(/dmod/bin/ngen --info | grep -m 1 -e 'NumPy Version: ' | cut -d ':' -f 2 | uniq | xargs) \
     'pydantic<2' \
-    #---------------------------------------------
-    # Ngen: calibration ngen-cal
-    #---------------------------------------------
-    "git+https://github.com/noaa-owp/ngen-cal@master#egg=ngen_cal&subdirectory=python/ngen_cal" \
-    #---------------------------------------------
-    # Setup and install ngiab_data_preprocess module to allow preparing data for ngiab
-    #   - [Optional] Download default hydrofabric for ngiab_data_preprocess
-    #---------------------------------------------
-    ngiab_data_preprocess==4.6.7 \
     'pandas>=2.0,<3.0' \
-    #&& uv run python -c "from data_sources.source_validation import download_and_update_hf; \
-    #			 download_and_update_hf();" \
     && rm -rf /tmp/*.whl
 
 # [LSTM-Update] Replace the noaa-owp example weights with jmframes
 RUN rm -rf /ngen/ngen/extern/lstm/trained_neuralhydrology_models
 COPY --from=lstm_weights /lstm_weights/trained_neuralhydrology_models /ngen/ngen/extern/lstm/trained_neuralhydrology_models
 
-# Make this venv available as JupyterHub kernel
-# ENV PATH=/ngen/.venv/bin:$PATH
-# RUN python -m ipykernel install --name=ngiab-pydantic1
-# #RUN python -m ipykernel install --user --name=NGIAB
 
 # To avoid error for ngen-parallel
 ENV RDMAV_FORK_SAFE=1
 
-##########
-# PyNGIAB (https://github.com/fbaig/ciroh_pyngiab)
-##########
-RUN pip install git+https://github.com/fbaig/ciroh_pyngiab.git
-
 COPY ./tests /tests
 
-#USER root
 # Update permissions to allow Jupyter non-root user to install and use packages
+RUN uv pip install tensorboard==2.16.* jupyter-tensorboard-proxy tensorboard_plugin_hydrograph==0.1.1 --system
 RUN chown -R ${NB_USER}:${NB_USER} \
     /home/jovyan/ \
     /tests/ \
@@ -291,7 +280,27 @@ RUN chown -R ${NB_USER}:${NB_USER} \
     && chmod +x /tests/test-entrypoint.sh
 
 USER ${NB_USER}
+ENV PATH="/home/jovyan/.local/bin:$PATH"
 WORKDIR /ngen/
 RUN echo "export PS1='\u\[\033[01;32m\]@ngiab_dev\[\033[00m\]:\[\033[01;35m\]\W\[\033[00m\]\$ '" >> ~/.bashrc
-# # Download hydrofabric when starting container
-# ENTRYPOINT uv run python -c "from data_sources.source_validation import download_and_update_hf; download_and_update_hf();"
+RUN mkdir ~/.ngiab/
+RUN echo "/ngen/ewri_cal/data/" >> ~/.ngiab/preprocessor
+RUN uvx --with ngiab-prep python -c "from data_sources.source_validation import download_and_update_hf; download_and_update_hf();" && rm ~/.ngiab/hydrofabric/v2.2/conus_nextgen.tar.gz
+RUN touch ~/.ngiab/hydrofabric/v2.2/no_update
+COPY --from=rust_install /root/.cargo/bin/bmi-driver /usr/local/bin/
+COPY --from=rust_install /root/.cargo/bin/rs-route /usr/local/bin/
+
+WORKDIR /ewri_cal
+ADD https://github.com/joshcu/ewri_cal.git /ewri_cal/
+
+
+ADD --chown=${NB_USER}:${NB_USER} --unpack --exclude=*DS_Store https://ciroh-awi-ewri-data.s3.us-east-1.amazonaws.com/EWRI26_USGS_02361000.tar.gz /ewri_cal/data/
+ADD --chown=${NB_USER}:${NB_USER} --unpack --exclude=*DS_Store https://ciroh-awi-ewri-data.s3.us-east-1.amazonaws.com/EWRI26_USGS_02450250.tar.gz /ewri_cal/data/
+ADD --chown=${NB_USER}:${NB_USER} --unpack --exclude=*DS_Store https://ciroh-awi-ewri-data.s3.us-east-1.amazonaws.com/EWRI26_USGS_10154200.tar.gz /ewri_cal/data/
+USER root
+RUN chown -R ${NB_USER}:${NB_USER} /ewri_cal/
+USER ${NB_USER}
+
+RUN uv sync
+
+# ENV TENSORBOARD_PROXY_LOGDIR=/ngen/ewri_cal/tensorboard
