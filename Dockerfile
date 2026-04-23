@@ -294,11 +294,15 @@ WORKDIR /ewri_cal
 ADD https://github.com/joshcu/ewri_cal.git /ewri_cal/
 
 
-ADD --chown=${NB_USER}:${NB_USER} --unpack --exclude=*DS_Store https://ciroh-awi-ewri-data.s3.us-east-1.amazonaws.com/EWRI26_USGS_02361000.tar.gz /ewri_cal/data/
-ADD --chown=${NB_USER}:${NB_USER} --unpack --exclude=*DS_Store https://ciroh-awi-ewri-data.s3.us-east-1.amazonaws.com/EWRI26_USGS_02450250.tar.gz /ewri_cal/data/
-ADD --chown=${NB_USER}:${NB_USER} --unpack --exclude=*DS_Store https://ciroh-awi-ewri-data.s3.us-east-1.amazonaws.com/EWRI26_USGS_10154200.tar.gz /ewri_cal/data/
+ADD --chown=${NB_USER}:${NB_USER} https://ciroh-awi-ewri-data.s3.us-east-1.amazonaws.com/EWRI26_USGS_02361000.tar.gz /ewri_cal/data/
+ADD --chown=${NB_USER}:${NB_USER} https://ciroh-awi-ewri-data.s3.us-east-1.amazonaws.com/EWRI26_USGS_02450250.tar.gz /ewri_cal/data/
+ADD --chown=${NB_USER}:${NB_USER} https://ciroh-awi-ewri-data.s3.us-east-1.amazonaws.com/EWRI26_USGS_10154200.tar.gz /ewri_cal/data/
 USER root
-RUN chown -R ${NB_USER}:${NB_USER} /ewri_cal/
+RUN cd /ewri_cal/data/ && \
+    for f in EWRI26_USGS_02361000.tar.gz EWRI26_USGS_02450250.tar.gz EWRI26_USGS_10154200.tar.gz; do \
+        tar -xzf "$f" --exclude='*DS_Store' && rm "$f"; \
+    done && \
+    chown -R ${NB_USER}:${NB_USER} /ewri_cal/
 USER ${NB_USER}
 
 RUN uv sync
