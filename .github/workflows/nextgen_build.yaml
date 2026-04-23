@@ -3,12 +3,12 @@ name: Build and Push Comm Nextgen
 on:
   push:
     branches:
-      - ngen-2i2c
+      - ewri2026
     tags:
       - 'v*'
   pull_request:
     branches:
-      - ngen-2i2c
+      - ewri2026
   workflow_dispatch:
     inputs:
       tag:
@@ -17,7 +17,7 @@ on:
         default: 'manual'
 
 env:
-  IMAGE_NAME: ngiab-2i2c
+  IMAGE_NAME: ewri2026
   QUAY_ORG: awiciroh
 
 jobs:
@@ -55,7 +55,7 @@ jobs:
             exit 0
           fi
 
-          # Branch push (refs/heads/ngen-2i2c → ngen-2i2c)
+          # Branch push (refs/heads/ewri2026 → ewri2026)
           if [[ "${GITHUB_REF}" == refs/heads/* ]]; then
             echo "value=${GITHUB_REF#refs/heads/}" >> "$GITHUB_OUTPUT"
             exit 0
