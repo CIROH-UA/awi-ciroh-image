@@ -174,7 +174,7 @@ RUN mkdir -p /usr/local/bin/before-notebook.d && \
     chmod +x /usr/local/bin/before-notebook.d/50-symfluence-symlink.sh
 
 # SYMFLUENCE expects this env variable to be set for finding the tools (e.g. SUMMA) at runtime.
-ENV SYMFLUENCE_DATA_DIR=/home/$(NB_USER)/SYMFLUENCE_data
+ENV SYMFLUENCE_DATA_DIR=/home/${NB_USER}/SYMFLUENCE_data
 
 USER ${NB_USER}
 
