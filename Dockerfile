@@ -82,7 +82,9 @@ ENV MPIFC=mpif90
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 
+# SYMFLUENCE uses this env variable for installing the tools (e.g. SUMMA)
 ENV SYMFLUENCE_DATA_DIR=/opt/symfluence/data
+
 ENV SYMFLUENCE_CODE_DIR=/opt/symfluence
 ENV SYMFLUENCE_ENV=/srv/conda/envs/symfluence
 
@@ -170,6 +172,9 @@ RUN mkdir -p /usr/local/bin/before-notebook.d && \
     "${SYMFLUENCE_DATA_DIR}" \
     > /usr/local/bin/before-notebook.d/50-symfluence-symlink.sh && \
     chmod +x /usr/local/bin/before-notebook.d/50-symfluence-symlink.sh
+
+# SYMFLUENCE expects this env variable to be set for finding the tools (e.g. SUMMA) at runtime.
+ENV SYMFLUENCE_DATA_DIR=/home/$(NB_USER)/SYMFLUENCE_data
 
 USER ${NB_USER}
 
