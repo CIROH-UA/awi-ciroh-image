@@ -29,7 +29,6 @@ RUN pip install --no-cache-dir \
     jupyterlab_vim \
     jupyter-tree-download \
     nb_black==1.0.5 \
-    google-cloud-bigquery \
     dataretrieval \
     hsfiles-jupyter && \
     pip install --no-cache-dir --no-deps colormap && \
@@ -50,6 +49,7 @@ RUN apt-get update && \
     gcc \
     g++ \
     gfortran \
+    make \
     cmake \
     libopenmpi-dev \
     openmpi-bin \
@@ -60,15 +60,15 @@ RUN apt-get update && \
     libnetcdf-dev \
     libnetcdff-dev \
     libblas-dev \
+    libblas3 \
     liblapack-dev \
+    liblapack3 \
     libopenblas-dev \
+    libopenblas0-pthread \
     libproj-dev \
     libgeos-dev \
     libudunits2-dev \
     libexpat1-dev \
-    cdo \
-    r-base \
-    r-base-dev \
     git \
     wget \
     && rm -rf /var/lib/apt/lists/*
@@ -94,7 +94,7 @@ RUN mamba create -n symfluence -y -c conda-forge \
         python=3.11 \
         ipykernel \
         "boost-cpp>=1.79" && \
-    ${SYMFLUENCE_ENV}/bin/pip install \
+    ${SYMFLUENCE_ENV}/bin/pip install --no-cache-dir \
         git+https://github.com/DarriEy/SYMFLUENCE.git@v0.8.2 && \
     ${SYMFLUENCE_ENV}/bin/pip uninstall -y \
         triton \
@@ -138,20 +138,19 @@ RUN CMAKE_PREFIX_PATH="${SYMFLUENCE_ENV}${CMAKE_PREFIX_PATH:+:${CMAKE_PREFIX_PAT
     SYMFLUENCE_PYTHON="${SYMFLUENCE_ENV}/bin/python" \
     ${SYMFLUENCE_ENV}/bin/symfluence binary install
 
-# Remove pip-installed HDF5/NetCDF bindings that symfluence may have pulled in.
+# Replace pip-installed HDF5/NetCDF bindings in the same layer to avoid
+# carrying both the pip and conda copies in the final image.
 RUN ${SYMFLUENCE_ENV}/bin/pip uninstall -y \
     h5py \
     netCDF4 \
-    h5netcdf || true
-
-RUN mamba install -n symfluence -y -c conda-forge \
+    h5netcdf || true && \
+    mamba install -n symfluence -y -c conda-forge \
     netcdf4 \
     h5py \
     hdf5 \
     h5netcdf \
-    gdal
-
-RUN conda clean -afy && mamba clean -afy
+    gdal && \
+    conda clean -afy && mamba clean -afy
 
 # Local build validation. Remove before pushing if you do not want build-time
 # verification in the published Dockerfile.
