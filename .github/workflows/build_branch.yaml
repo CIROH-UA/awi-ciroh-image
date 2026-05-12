@@ -1,4 +1,4 @@
-name: Branch Build and push container image
+6name: Branch Build and push container image
 
 on:
   workflow_dispatch:
@@ -35,8 +35,8 @@ jobs:
         DOCKER_USERNAME: ${{ secrets.QUAY_CIROH_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.QUAY_CIROH_PASSWORD }}
         DOCKER_REGISTRY: "quay.io"
-        IMAGE_NAME: "awiciroh/devcon25"
-        ADDITIONAL_TAG: ${{ env.TAG_NAME}}
+        IMAGE_NAME: "awiciroh/devcon26"
+        ADDITIONAL_TAG: ${{ env.TAG_NAME }}
 
     # Lets us monitor disks getting full as images get bigger over time
     - name: Show how much disk space is left
