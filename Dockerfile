@@ -95,7 +95,7 @@ RUN mamba create -n symfluence -y -c conda-forge \
         ipykernel \
         "boost-cpp>=1.79" && \
     ${SYMFLUENCE_ENV}/bin/pip install --no-cache-dir \
-        git+https://github.com/DarriEy/SYMFLUENCE.git@v0.8.2 && \
+        git+https://github.com/DarriEy/SYMFLUENCE.git@develop && \
     ${SYMFLUENCE_ENV}/bin/pip uninstall -y \
         triton \
         nvidia-cublas-cu12 \
