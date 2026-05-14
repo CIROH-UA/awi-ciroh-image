@@ -1,6 +1,6 @@
-channels:
-  - conda-pypi
 dependencies:
+  - python=3.12.*
+  - numpy=2.3.2
   - pip
   - pip:
     - affine==2.4.0
@@ -16,7 +16,6 @@ dependencies:
     - joblib==1.5.1
     - kiwisolver==1.4.8
     - matplotlib==3.10.5
-    - numpy==2.3.2
     - packaging==25.0
     - pandas==2.3.1
     - pillow==11.3.0
