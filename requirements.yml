@@ -1,3 +1,5 @@
+channels:
+  - conda-pypi
 dependencies:
   - pip
   - pip:
