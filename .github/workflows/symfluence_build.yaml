@@ -25,6 +25,14 @@ jobs:
     - name: Checkout files in repo
       uses: actions/checkout@main
 
+    - name: Set image tag name
+      shell: bash
+      run: |
+        ref_name="${GITHUB_HEAD_REF:-${GITHUB_REF##*/}}"
+        safe_ref=$(echo "$ref_name" | sed 's#[/:@ ]#-#g' | tr -cd '[:alnum:]._-')
+        echo "TAG_NAME=symfluence-$safe_ref" >> "$GITHUB_ENV"
+        echo "Using additional image tag: symfluence-$safe_ref"
+
     - name: Build and push the image to quay.io
       uses: jupyterhub/repo2docker-action@master
       with:
@@ -33,7 +41,7 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
         DOCKER_REGISTRY: "quay.io"
         IMAGE_NAME: "2i2c/awi-ciroh-image"
-        ADDITIONAL_TAG: "symfluence-develop"
+        ADDITIONAL_TAG: ${{ env.TAG_NAME }}
 
     # Lets us monitor disks getting full as images get bigger over time
     - name: Show how much disk space is left
