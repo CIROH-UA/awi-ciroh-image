@@ -28,7 +28,17 @@ jobs:
     - name: Set image tag name
       shell: bash
       run: |
-        ref_name="${GITHUB_HEAD_REF:-${GITHUB_REF##*/}}"
+        ref_name="${{ github.event.inputs.tag }}"
+
+        if [ -z "$ref_name" ] || [ "$ref_name" = "manual" ]; then
+          ref_name=$(grep -oE 'git\+https://github\.com/DarriEy/SYMFLUENCE\.git@[^[:space:]\\]+' Dockerfile | head -n1 | sed 's#.*@##')
+        fi
+
+        if [ -z "$ref_name" ]; then
+          echo "Could not determine SYMFLUENCE ref for image tag" >&2
+          exit 1
+        fi
+
         safe_ref=$(echo "$ref_name" | sed 's#[/:@ ]#-#g' | tr -cd '[:alnum:]._-')
         echo "TAG_NAME=symfluence-$safe_ref" >> "$GITHUB_ENV"
         echo "Using additional image tag: symfluence-$safe_ref"
