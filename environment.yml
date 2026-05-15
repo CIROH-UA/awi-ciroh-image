@@ -8,3 +8,6 @@ dependencies:
       - jupyter==1.1.1
       - matplotlib==3.10.8
       - pandas==3.0.2
+      - hsclient[all]==1.1.6
+      - pydantic>=2.7,<2.8
+      - git+https://github.com/hydroshare/nbfetch.git@v0.6.4
