@@ -1,0 +1,27 @@
+name: devcon26_emulator_workshop
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.10.12
+
+  # Core scientific Python stack
+  - numpy
+  - pandas
+  - matplotlib
+  - seaborn
+  - scikit-learn
+  - joblib
+
+  # Gradient-boosting models
+  - lightgbm
+  - xgboost
+
+  # Jupyter / notebook support
+  - jupyter
+  - notebook
+  - ipykernel
+  - ipython
+
+  - pip
