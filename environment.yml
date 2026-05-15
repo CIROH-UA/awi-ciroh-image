@@ -1,26 +1,24 @@
 dependencies:
  - python=3.11.8
- - pip
- - pip:
-   - dask>=2025.7.0
-   - xarray>=2024.2.0
-   - geopandas>=1.1.1
-   - h5netcdf>=1.6.4
-   - hvplot>=0.11.3
-   - requests>=2.32.2
-   - rioxarray>=0.19.0
-   - s3fs>=2025.5.1
-   - numpy>=2.3.1
-   - cftime>=1.6.4
-   - folium>=0.20.0
-   - matplotlib==3.8.3
-   - pandas==2.2.1
-   - shapely==2.0.3
-   - ipyleaflet==0.18.2
-   - sidecar==0.7.0
-   - ipywidgets==8.1.2
-   - fsspec >= 2024.6.0
-   - sys >= 3.12.3
-   - geocube >= 0.5.2
-   - zarr >= 2.18.2
-   - jupyterlab >= 4.4.3
+ - dask>=2025.7.0
+ - xarray>=2024.2.0
+ - geopandas>=1.1.1
+ - h5netcdf>=1.6.4
+ - hvplot>=0.11.3
+ - requests>=2.32.2
+ - rioxarray>=0.19.0
+ - s3fs>=2025.5.1
+ - numpy>=2.3.1
+ - cftime>=1.6.4
+ - folium>=0.20.0
+ - matplotlib==3.8.3
+ - pandas==2.2.1
+ - shapely==2.0.3
+ - ipyleaflet==0.18.2
+ - sidecar==0.7.0
+ - ipywidgets==8.1.2
+ - fsspec >= 2024.6.0
+ - sys >= 3.12.3
+ - geocube >= 0.5.2
+ - zarr >= 2.18.2
+ - jupyterlab >= 4.4.3
