@@ -1,0 +1,19 @@
+name: workshop
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.11
+  - satpy
+  - pyresample
+  - pyspectral
+  - cartopy
+  - matplotlib
+  - xarray
+  - dask
+  - numpy
+  - h5py
+  - netcdf4
+  - rasterio
+  - jupyterlab
+  - ipywidgets
