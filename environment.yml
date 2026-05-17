@@ -4,6 +4,7 @@ channels:
 
 dependencies:
   - python=3.11
+  - sqlite>=3.35
   - satpy
   - pyresample
   - pyspectral
