@@ -33,3 +33,4 @@ dependencies:
     - six==1.17.0
     - threadpoolctl==3.6.0
     - tzdata==2025.2
+    - git+https://github.com/hydroshare/nbfetch.git@v0.6.4
