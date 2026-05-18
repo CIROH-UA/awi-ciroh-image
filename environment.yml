@@ -320,10 +320,10 @@ dependencies:
   - pyshp=3.0.4=pyhd8ed1ab_0
   - pyside6=6.11.1=py311hf27b23e_1
   - pysocks=1.7.1=pyha55dd90_7
-  - python=3.11.15=hd63d673_0_cpython
+  - python=3.11.14
   - python-dateutil=2.9.0.post0=pyhe01879c_2
   - python-fastjsonschema=2.21.2=pyhe01879c_0
-  - python-gil=3.11.15=hd8ed1ab_0
+  - python-gil=3.11.14
   - python-json-logger=3.2.1=pyh332efcf_0
   - python-tzdata=2026.2=pyhd8ed1ab_0
   - python_abi=3.11=8_cp311
