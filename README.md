@@ -1,68 +1,99 @@
-# hub-user-image-template :paperclip:
+# awi-ciroh-image
 
-This is a template repository for creating dedicated user images for 2i2c hubs.
+This is a repository for creating dedicated user images for CIROH-2i2c JupyterHub.
+The `main` branch provides the most up-to-date template, while the other branches host both alternate images and development branches.
 
-## Overall workflow :gear:
+This repository's workflow feeds its branches into the [repo2docker](https://github.com/jupyterhub/repo2docker) toolchain. For more in-depth coverage of the toolchain's capabilities, please see the [repo2docker documentation](https://repo2docker.readthedocs.io/en/latest/).
 
-The overall workflow is to:
+From there, the GitHub Action CI/CD workflow pushes completed images to to the [quay.io/awiciroh](https://quay.io/user/awiciroh) registry.
 
-1. Fork this repository to create your image repository
+# Creating a new image
 
-2. Hook your image repository to quay.io
+Depending on your needs, there are a few primary paths for creating new 2i2c images.
 
-3. Customize the image by editing repo2docker files in your image repository.
+Alternatively, you can also **request an image to be created** by creating a ticket on the [issues page](https://github.com/CIROH-UA/awi-ciroh-image/issues). If you do, please be sure to provide an `environment.yml`, `requirements.txt`, or other configuration file.
 
-   Changes can either be done by direct commits to main on your image repository, or through a pull request from a fork of your image repository. Direct commits will build the image and push it to Quay.io. PRs will build the image and offer a link to test it using Binder. Merging the PR will cause a commit on main and therefore trigger a build and push to Quay.io.
+## Creating an image from a configuration file
+This is typically the most appropriate approach for general use cases, such as configuring an environment to run Python code.  
+Before completing this process, create or export a file documenting your project's dependencies. For Python projects, this will typically be a `requirements.txt` file or a Conda `environment.yml` file.  
+For other types of environments, the repo2docker documentation provides [a full listing of supported configuration files](https://repo2docker.readthedocs.io/en/latest/configuration/).
 
-4. Configure your Hub to use this new image
+<details>
+   <summary><i>Click to expand...</i></summary>
+   <ol>
+      <li>If necessary, create a personal fork of this repository.</li>
+      <li>Create a new branch off of the <code>main</code> branch. Give it a name that describes your environment, <bode>preferably-using-kebab-case</code>.</li>
+      <li>Delete the Dockerfile at the root of the branch. (Otherwise, it will override any environment files you provide.)</li>
+      <li>Place your configuration file at the root of the repository.</li>
+   </ol>
+   <p>If a working environment is provided, the above steps are sufficient to create a working image. However, this image will not support HydroShare integrations with `nbfetch` unless the following additional steps are taken:
+   <ol>
+      <li>Create a new, empty plaintext file called `postBuild`. (Do not include a file extension.)</li>
+      <li>
+         Add the following content to the new file:<br>
+         <code>
+            #!/bin/bash<br>
+            jupyter server extension enable --py nbfetch --sys-prefix
+         </code>
+      </li>
+   </ol>
+</details>
+<br>
 
-### In-depth guide
+If you have completed these steps on a fork, you can submit a PR back to the `CIROH-UA/awi-ciroh-image` repository to have your changes included on a branch, allowing your image to be hosted on CIROH-2i2c JupyterHub.
 
-Checkout the 2i2c docs for an in-depth guide on how to use this template repository to create a custom user image and use it for your hub :arrow_right: https://docs.2i2c.org/en/latest/admin/howto/environment/hub-user-image-template-guide.html.
+## Creating an image from the default template
+This approach is typically appropriate for more involved configurations, allowing for full editing of a Dockerfile. The Dockerfile overrides any provided environment files, which can be inconvenient.
 
-## About this template repository :information_source:
+(Consider using a configuration file alongside the `postBuild` script instead for minor configuration changes, as seen in the [above steps](#creating-an-image-from-a-configuration-file).)
+<details>
+   <summary><i>Click to expand...</i></summary>
+   <ol>
+      <li>If necessary, create a personal fork of this repository.</li>
+      <li>Create a new branch off of the <code>main</code> branch. Give it a name that describes your environment, <bode>preferably-using-kebab-case</code>.</li>
+      <li>Edit the provided default Dockerfile to your liking.
+   </ol>
+</details>
+<br>
 
-This template repository enables [jupyterhub/repo2docker-action](https://github.com/jupyterhub/repo2docker-action).
-This GitHub action builds a Docker image using the contents of this repo and pushes it to the [Quay.io](https://quay.io/) registry.
+The guidance in the [Advanced Binder Documentation](https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html) may be worth a look, as it provides best practices for reproducibility.
 
-### The environment
+## Creating a NextGen-based image
+If you'd like to work with the NextGen framework, this approach will yield an image with the dependencies you need.
+<details>
+   <summary><i>Click to expand...</i></summary>
+   <ol>
+      <li>If necessary, create a personal fork of this repository.</li>
+      <li>Create a new branch off of the <code>ngen-2i2c</code> branch. Give it a name that describes your environment, <bode>preferably-using-kebab-case</code>.</li>
+      <li>Edit the provided default Dockerfile to your liking.
+   </ol>
+</details>
+<br>
 
-It provides an example of a `environment.yml` conda configuration file for repo2docker to use.
-This file can be used to list all the conda packages that need to be installed by `repo2docker` in your environment.
-The `repo2docker-action` will update the [base repo2docker](https://github.com/jupyterhub/repo2docker/blob/HEAD/repo2docker/buildpacks/conda/environment.yml) conda environment with the packages listed in this `environment.yml` file.
+If you'd like to contribute changes to the `ngen-2i2c` branch, these steps will also allow you to test and submit those changes as a PR.
 
-**Note:**
-A complete list of possible configuration files that can be added to the repository and be used by repo2docker to build the Docker image, can be found in the [repo2docker docs](https://repo2docker.readthedocs.io/en/latest/config_files.html#configuration-files).
+# GitHub workflows
 
-### The GitHub workflows
-
-This template repository provides two GitHub workflows that can build and push the image to quay.io when configured.
+This template repository provides several GitHub workflows that build and push the image to quay.io when configured.
 
 ![Workflows](images/workflows.png)
 
-#### 1. Build and push container image :arrow_right: [build.yaml](https://github.com/2i2c-org/hub-user-image-template/blob/main/.github/workflows/build.yaml)
+## Build and push container image :arrow_right: [build.yaml](https://github.com/ciroh-ua/awi-ciroh-image/blob/main/.github/workflows/build.yaml)
 
 This workflow is triggered by every pushed commit on the main branch of the repo (including when a PR is merged).
 It **builds** the image and **pushes** it to the registry.
 
-#### 2. Test container image build :arrow_right: [test.yaml](https://github.com/2i2c-org/hub-user-image-template/blob/MAIN/.github/workflows/test.yaml)
+## Branch Build and push container image :arrow_right: [build_branch.yaml](https://github.com/ciroh-ua/awi-ciroh-image/blob/main/.github/workflows/build.yaml)
 
-This workflow is triggerd by every Pull Request commit and it **builds** the image, but it **doesn't** push it to the registry, unless explicitly configured to do so. Checkout [this section](#enable-quayio-image-push-for-testyaml) on how to enable image pushes on Pull Requests.
+This workflow is triggered manually on non-main branches of the repo, being responsible for publishing additional images.
+It **builds** the image and **pushes** it to the registry. Currently, it is set by default to target `quay.io/awiciroh/devcon26:{branch-name}`, but this can be configured on a per-branch basis.
 
-#### 3. Test this PR on Binder Badge :arrow_right: [binder.yaml](https://github.com/2i2c-org/hub-user-image-template/blob/MAIN/.github/workflows/binder.yaml)
+## Test container image build :arrow_right: [test.yaml](https://github.com/ciroh-ua/awi-ciroh-image/blob/MAIN/.github/workflows/test.yaml)
+
+This workflow is triggered by every Pull Request commit and it **builds** the image, but it **doesn't** push it to the registry, unless explicitly configured to do so. Check out [this section](#enable-quayio-image-push-for-testyaml) on how to enable image pushes on Pull Requests.
+
+## Test this PR on Binder Badge :arrow_right: [binder.yaml](https://github.com/ciroh-ua/awi-ciroh-image/blob/MAIN/.github/workflows/binder.yaml)
 
 This workflow posts a comment inside a pull request, every time a pull request gets opened. The comment contains a "Test this PR on Binder" badge, which can be used to access the image defined by the PR in [mybinder.org](https://mybinder.org/).
 
 ![Test this PR on Binder](images/binder-badge.png)
-
-## NextGen National Water Model (NWM) Image update
-
-#### 1. Create a feature branch off ngen-2i2c
-
-#### 2. Make changes on the feature branch
-
-#### 3. Build and test feature branch
-
-#### 4. Create a PR into ngen-2i2c branch
-
-#### 5. Once the PR is merged, bump the image tag and build new image with new tag.
