@@ -433,3 +433,4 @@ dependencies:
       - pydantic-core==2.18.4
       - rdflib==5.0.0
       - requests-oauthlib==2.0.0
+      - git+https://github.com/hydroshare/nbfetch.git@v0.6.4
