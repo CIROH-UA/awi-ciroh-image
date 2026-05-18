@@ -431,7 +431,7 @@ dependencies:
       - ipython-genutils==0.2.0
       - isodate==0.7.2
       - nbclassic==1.3.3
-      - nbfetch==0.6.3
+      - git+https://github.com/hydroshare/nbfetch.git@v0.6.3
       - notebook==6.5.4
       - oauthlib==3.3.1
       - pydantic==2.7.4
