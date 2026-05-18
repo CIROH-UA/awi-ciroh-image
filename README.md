@@ -16,10 +16,26 @@ Alternatively, you can also **request an image to be created** by creating a tic
 ## Creating an image from a configuration file
 This is typically the most appropriate approach for general use cases, such as configuring an environment to run Python code.  
 Before completing this process, create or export a file documenting your project's dependencies. For Python projects, this will typically be a `requirements.txt` file or a Conda `environment.yml` file.  
+
+<details>
+   <summary><i>Exporting a conda <code>environment.yml</code> file (Click to expand...)</i></summary>
+   <ol>
+      <li>
+         Open your terminal or command prompt. Make sure you have conda installed and activated in the environment that contains the packages you want to use for creating custom images.
+         Learn more <a href="https://conda.io/projects/conda/en/latest/user-guide/getting-started.html">here</a>.
+      </li>
+      <li>
+         Run the following command, replacing <code>ENVNAME</code> with the actual name of your environment.<br>
+         <code>conda env export -n ENVNAME > environment.yml</code>
+      </li>
+   </ol>
+</details>
+<br>
+
 For other types of environments, the repo2docker documentation provides [a full listing of supported configuration files](https://repo2docker.readthedocs.io/en/latest/configuration/).
 
 <details>
-   <summary><i>Click to expand...</i></summary>
+   <summary><i>Image creation instructions (Click to expand...)</i></summary>
    <ol>
       <li>If necessary, create a personal fork of this repository.</li>
       <li>Create a new branch off of the <code>main</code> branch. Give it a name that describes your environment, <bode>preferably-using-kebab-case</code>.</li>
@@ -47,7 +63,7 @@ This approach is typically appropriate for more involved configurations, allowin
 
 (Consider using a configuration file alongside the `postBuild` script instead for minor configuration changes, as seen in the [above steps](#creating-an-image-from-a-configuration-file).)
 <details>
-   <summary><i>Click to expand...</i></summary>
+   <summary><i>Image creation instructions (Click to expand...)</i></summary>
    <ol>
       <li>If necessary, create a personal fork of this repository.</li>
       <li>Create a new branch off of the <code>main</code> branch. Give it a name that describes your environment, <bode>preferably-using-kebab-case</code>.</li>
@@ -61,7 +77,7 @@ The guidance in the [Advanced Binder Documentation](https://mybinder.readthedocs
 ## Creating a NextGen-based image
 If you'd like to work with the NextGen framework, this approach will yield an image with the dependencies you need.
 <details>
-   <summary><i>Click to expand...</i></summary>
+   <summary><i>Image creation instructions (Click to expand...)</i></summary>
    <ol>
       <li>If necessary, create a personal fork of this repository.</li>
       <li>Create a new branch off of the <code>ngen-2i2c</code> branch. Give it a name that describes your environment, <bode>preferably-using-kebab-case</code>.</li>
