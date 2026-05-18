@@ -14,3 +14,6 @@ dependencies:
   - ipywidgets
   - tqdm
   - pyyaml
+  - pip
+  - pip:
+    - git+https://github.com/hydroshare/nbfetch.git@v0.6.4
