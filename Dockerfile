@@ -93,10 +93,37 @@ RUN mkdir -p /opt/symfluence/data && chmod -R 755 /opt/symfluence
 RUN mamba create -n symfluence -y -c conda-forge \
         python=3.11 \
         ipykernel \
-        "boost-cpp>=1.79" && \
-    ${SYMFLUENCE_ENV}/bin/pip install --no-cache-dir \
-        git+https://github.com/DarriEy/SYMFLUENCE.git@v0.8.3 && \
-    ${SYMFLUENCE_ENV}/bin/pip uninstall -y \
+        "boost-cpp>=1.79" \
+        pip
+
+RUN ${SYMFLUENCE_ENV}/bin/python -m pip install --no-cache-dir --upgrade pip setuptools wheel
+
+# Network can be flaky when pip resolves/downloads SYMFLUENCE's large dependency set.
+# Retry a few times to avoid transient IncompleteRead/ProtocolError failures.
+RUN set -eux; \
+    success=0; \
+    for attempt in 1 2 3; do \
+      if ${SYMFLUENCE_ENV}/bin/python -m pip install \
+        --no-cache-dir \
+        --prefer-binary \
+        --progress-bar off \
+        --retries 20 \
+        --timeout 120 \
+        -v \
+        git+https://github.com/DarriEy/SYMFLUENCE.git@v0.8.4; then \
+        success=1; \
+        break; \
+      fi; \
+      echo "SYMFLUENCE install attempt ${attempt} failed; retrying..."; \
+      sleep 15; \
+    done; \
+    test "$success" -eq 1
+
+RUN ${SYMFLUENCE_ENV}/bin/python -m pip show symfluence && \
+    ${SYMFLUENCE_ENV}/bin/python -m symfluence.main_cli --version
+
+# Optional GPU wheels may appear as transitive deps; remove if present.
+RUN ${SYMFLUENCE_ENV}/bin/pip uninstall -y \
         triton \
         nvidia-cublas-cu12 \
         nvidia-cuda-cupti-cu12 \
@@ -112,8 +139,9 @@ RUN mamba create -n symfluence -y -c conda-forge \
         nvidia-nccl-cu12 \
         nvidia-nvjitlink-cu12 \
         nvidia-nvshmem-cu12 \
-        nvidia-nvtx-cu12 || true && \
-    ${SYMFLUENCE_ENV}/bin/pip install --no-cache-dir --upgrade --force-reinstall \
+        nvidia-nvtx-cu12 || true
+
+RUN ${SYMFLUENCE_ENV}/bin/pip install --no-cache-dir --upgrade --force-reinstall \
         --index-url https://download.pytorch.org/whl/cpu \
         "torch>=2.0.0,<3.0.0"
 
