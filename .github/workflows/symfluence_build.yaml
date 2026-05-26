@@ -3,9 +3,8 @@ on:
   push:
     branches:
       - symfluence-install
-  pull_request:
-    branches:
-      - symfluence-install
+      - symfluence-2i2c-v*
+
   workflow_dispatch:
     inputs:
       tag:
