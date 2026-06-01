@@ -110,7 +110,7 @@ RUN set -eux; \
         --retries 20 \
         --timeout 120 \
         -v \
-        git+https://github.com/DarriEy/SYMFLUENCE.git@v0.8.4; then \
+        git+https://github.com/DarriEy/SYMFLUENCE.git@v0.8.5; then \
         success=1; \
         break; \
       fi; \
