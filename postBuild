@@ -5,11 +5,13 @@ set -euo pipefail
 jupyter server extension enable --py nbfetch --sys-prefix
 
 # install uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/jovyan/.local/bin sh
 
 # install pixi
-curl -fsSL https://pixi.sh/install.sh | bash
+curl -fsSL https://pixi.sh/install.sh | PIXI_HOME=/home/jovyan/.local bash
 
 # add pixi and uv to PATH
-echo 'export PATH="/root/.pixi/bin:/root/.local/bin:${PATH}"' >>~/.bashrc
+echo 'export PATH="/home/jovyan/.local/bin:$PATH""' >>/home/jovyan/.bashrc
 
+# add some aliases
+echo "alias ll='ls -alF'" >>~/.bashrc
