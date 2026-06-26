@@ -7,6 +7,8 @@ This repository's workflow feeds its branches into the [repo2docker](https://git
 
 From there, the GitHub Action CI/CD workflow pushes completed images to to the [quay.io/awiciroh](https://quay.io/user/awiciroh) registry.
 
+> To see currently available images, please see the listing on [CIROH Hub](https://hub.ciroh.org/docs/services/cloudservices/2i2c/available-images) or the [wiki](https://github.com/CIROH-UA/awi-ciroh-image/wiki/2i2c-image-list).
+
 # Creating a new image
 
 Depending on your needs, there are a few primary paths for creating new 2i2c images.
