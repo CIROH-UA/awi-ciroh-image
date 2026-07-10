@@ -155,6 +155,26 @@ RUN ${SYMFLUENCE_ENV}/bin/pip install --no-cache-dir --upgrade --force-reinstall
         --index-url https://download.pytorch.org/whl/cpu \
         "torch>=2.0.0,<3.0.0"
 
+# Install CPU-only JAX and the jax-related extras into the symfluence environment.
+# We install these packages directly (rather than using the symfluence[jax]
+# extra) to avoid re-installing or replacing the symfluence package itself.
+# Use the official jax release index for CPU wheels.
+# Here the symfluence jax dependencies are pinned: https://github.com/symfluence-org/SYMFLUENCE/blob/main/pyproject.toml
+# NOTE: Update the pinned versions in the Dockerfile as needed to match the symfluence pyproject.toml.
+RUN set -eux; \
+    success=0; \
+    for attempt in 1 2 3; do \
+      if ${SYMFLUENCE_ENV}/bin/pip install --no-cache-dir --upgrade \
+         "jax[cpu]" -f https://storage.googleapis.com/jax-releases/jax_releases.html \
+         "jsnow17>=0.1.0" "jsacsma>=0.2.3" "jxaj>=0.2.3" "jhbv>=0.2.4" "jhechms>=0.2.3" "jtopmodel>=0.2.3"; then \
+        success=1; \
+        break; \
+      fi; \
+      echo "JAX+extras install attempt ${attempt} failed; retrying..."; \
+      sleep 15; \
+    done; \
+    test "$success" -eq 1
+
 ENV BOOST_ROOT=${SYMFLUENCE_ENV}
 ENV Boost_ROOT=${SYMFLUENCE_ENV}
 ENV BOOST_INCLUDEDIR=${SYMFLUENCE_ENV}/include
