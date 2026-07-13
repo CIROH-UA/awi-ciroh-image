@@ -25,7 +25,7 @@ RUN apt-get -y update \
  && rm -rf /var/lib/apt/lists/*
 
 # Install Podman
-RUN sudo apt-get -y install podman
+RUN apt-get -y install podman
 
 # Install uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
