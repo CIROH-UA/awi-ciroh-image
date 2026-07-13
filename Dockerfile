@@ -12,6 +12,7 @@ RUN apt-get update -qq --yes > /dev/null && \
     apt-get install --yes -qq gnupg2 > /dev/null && \
     rm -rf /var/lib/apt/lists/*
 
+# Updated: now installs Podman
 RUN apt-get -y update \
  && apt-get install -y dbus-x11 \
    firefox \
@@ -22,10 +23,8 @@ RUN apt-get -y update \
    xorg \
    xubuntu-icon-theme \
    curl \
+   podman \
  && rm -rf /var/lib/apt/lists/*
-
-# Install Podman
-RUN apt-get -y install podman
 
 # Install uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
