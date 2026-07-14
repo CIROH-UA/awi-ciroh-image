@@ -30,7 +30,7 @@ RUN apt-get -y update \
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Install Node.js and npm
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y nodejs
 
 # Install TurboVNC (https://github.com/TurboVNC/turbovnc)
