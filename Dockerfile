@@ -28,7 +28,7 @@ RUN apt-get -y update \
 
 # Install Apptainer
 RUN wget https://github.com/apptainer/apptainer/releases/download/v1.5.2/apptainer_1.5.2_amd64.deb \
- && sudo apt install -y ./apptainer_1.5.2_amd64.deb \
+ && apt install -y ./apptainer_1.5.2_amd64.deb \
  && rm ./apptainer_1.5.2_amd64.deb
 
 # Install uv
