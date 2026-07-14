@@ -27,7 +27,7 @@ RUN apt-get -y update \
  && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js and npm
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs
 
 # Install TurboVNC (https://github.com/TurboVNC/turbovnc)
