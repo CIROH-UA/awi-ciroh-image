@@ -1,7 +1,5 @@
-# This Dockerfile aims to provide a Pangeo-style image with the VNC/Linux Desktop feature
-# It was constructed by following the instructions and copying code snippets laid out
-# and linked from here:
-# https://github.com/2i2c-org/infrastructure/issues/1444#issuecomment-1187405324
+# Based on main branch of CIROH-UA/awi-ciroh-image as of 7/13/26, with upgrade to Node 22.x applied.
+# Aims to instantiate an environment habitable to running NGIAB via Apptainer/Singularity.
 
 FROM pangeo/pangeo-notebook:2024.04.08
 
@@ -14,6 +12,7 @@ RUN apt-get update -qq --yes > /dev/null && \
     apt-get install --yes -qq gnupg2 > /dev/null && \
     rm -rf /var/lib/apt/lists/*
 
+# Updated: now installs Alien for rpm dependencies
 RUN apt-get -y update \
  && apt-get install -y dbus-x11 \
    firefox \
@@ -24,10 +23,18 @@ RUN apt-get -y update \
    xorg \
    xubuntu-icon-theme \
    curl \
+   alien \
  && rm -rf /var/lib/apt/lists/*
 
+# Install Apptainer
+RUN curl -s https://raw.githubusercontent.com/apptainer/apptainer/main/tools/install-unprivileged.sh | \
+ && bash -s - install-dir
+
+# Install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # Install Node.js and npm
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs
 
 # Install TurboVNC (https://github.com/TurboVNC/turbovnc)
