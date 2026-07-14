@@ -28,7 +28,7 @@ RUN apt-get -y update \
 
 # Install Apptainer
 RUN curl -s https://raw.githubusercontent.com/apptainer/apptainer/main/tools/install-unprivileged.sh | \
- && bash -s - install-dir
+	bash -s - install-dir
 
 # Install uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
