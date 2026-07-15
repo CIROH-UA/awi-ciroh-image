@@ -39,7 +39,7 @@ RUN apt-get -y update \
    uidmap \
    wget \
    zlib1g-dev \
-   libsubid-dev
+   libsubid-dev \
 && rm -rf /var/lib/apt/lists/*
 
 # Install Go
