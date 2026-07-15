@@ -42,19 +42,19 @@ RUN apt-get -y update \
 && rm -rf /var/lib/apt/lists/*
 
 # Install Go
-RUN export VERSION=1.26.5 OS=linux ARCH=amd64 && \
-    wget https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
+ENV VERSION=1.26.5 OS=linux ARCH=amd64
+RUN wget https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
     sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
     rm go$VERSION.$OS-$ARCH.tar.gz
 
 # Set up Go environment
-RUN echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
-    echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
+ENV GOPATH=/home/jovyan
+RUN echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
     source ~/.bashrc
 
 # Download Singularity
-RUN export VERSION=4.5.0 && \
-    wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-ce-${VERSION}.tar.gz && \
+ENV VERSION=4.5.0
+RUN wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-ce-${VERSION}.tar.gz && \
     tar -xzf singularity-ce-${VERSION}.tar.gz && \
 	rm singularity-ce-${VERSION}.tar.gz
 
