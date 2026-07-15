@@ -44,13 +44,12 @@ RUN apt-get -y update \
 # Install Go
 ENV VERSION=1.26.5 OS=linux ARCH=amd64
 RUN wget https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
-    tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
+    tar -C /usr/local -xzf go$VERSION.$OS-$ARCH.tar.gz && \
     rm go$VERSION.$OS-$ARCH.tar.gz
 
 # Set up Go environment
 ENV GOPATH=/home/jovyan
-RUN echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
-    source ~/.bashrc
+RUN echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> $BASH_ENV
 
 # Download Singularity
 ENV VERSION=4.5.0
