@@ -12,7 +12,7 @@ RUN apt-get update -qq --yes > /dev/null && \
     apt-get install --yes -qq gnupg2 > /dev/null && \
     rm -rf /var/lib/apt/lists/*
 
-# Updated: now installs Alien for rpm dependencies
+# Updated: now installs Singularity dependencies
 RUN apt-get -y update \
  && apt-get install -y dbus-x11 \
    firefox \
@@ -23,13 +23,46 @@ RUN apt-get -y update \
    xorg \
    xubuntu-icon-theme \
    curl \
-   alien \
- && rm -rf /var/lib/apt/lists/*
+   autoconf \
+   automake \
+   cryptsetup \
+   fuse2fs \
+   git \
+   fuse \
+   libfuse-dev \
+   libseccomp-dev \
+   libtool \
+   pkg-config \
+   runc \
+   squashfs-tools \
+   squashfs-tools-ng \
+   uidmap \
+   wget \
+   zlib1g-dev \
+   libsubid-dev
+&& rm -rf /var/lib/apt/lists/*
 
-# Install Apptainer
-RUN wget https://github.com/apptainer/apptainer/releases/download/v1.5.2/apptainer_1.5.2_amd64.deb \
- && apt install -y ./apptainer_1.5.2_amd64.deb \
- && rm ./apptainer_1.5.2_amd64.deb
+# Install Go
+RUN export VERSION=1.26.5 OS=linux ARCH=amd64 && \
+    wget https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
+    sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
+    rm go$VERSION.$OS-$ARCH.tar.gz
+
+# Set up Go environment
+RUN echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
+    echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
+    source ~/.bashrc
+
+# Download Singularity
+RUN export VERSION=4.5.0 && \
+    wget https://github.com/sylabs/singularity/releases/download/v${VERSION}/singularity-ce-${VERSION}.tar.gz && \
+    tar -xzf singularity-ce-${VERSION}.tar.gz && \
+	rm singularity-ce-${VERSION}.tar.gz
+
+RUN cd singularity-ce-${VERSION} && \
+	./mconfig --without-suid --prefix=/home/jovyan/singularity-ce && \
+    make -C ./builddir && \
+    make -C ./builddir install
 
 # Install uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
