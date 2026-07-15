@@ -49,7 +49,7 @@ RUN wget https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
 
 # Set up Go environment
 ENV GOPATH=/home/jovyan
-RUN echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> $BASH_ENV
+ENV PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin
 
 # Download Singularity
 ENV VERSION=4.5.0
