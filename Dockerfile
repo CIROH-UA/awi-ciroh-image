@@ -212,7 +212,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     #---------------------------------------------
     # Extern models (SUMMA/SUNDIALS) ported from NGIAB-CloudInfra
     #---------------------------------------------
-    libopenblas-dev \
+    libopenblas-dev libnetcdff-dev \
     #---------------------------------------------
     # 2i2c: Packages for Linux Desktop
     #---------------------------------------------
