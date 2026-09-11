@@ -70,10 +70,23 @@ jobs:
 
       - name: Free disk space
         run: |
+          # The image now bundles a Rust toolchain build, SUMMA/SUNDIALS/SAC-SMA/
+          # snow17, and dHBV2+PyTorch on top of the existing stack, so the
+          # runner's default ~14GB free disk isn't enough headroom for the
+          # multi-stage build cache plus the loaded final image (~19GB).
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf /usr/local/graalvm
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
           docker system prune -af
+          df -h /
 
       - name: Build and push
         uses: docker/build-push-action@v5
