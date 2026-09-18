@@ -261,9 +261,9 @@ ENV PATH=$PATH:$JAVA_HOME/bin
 RUN pip3 install uv && \
     uv pip install --system --no-cache-dir \
     numpy==$(/dmod/bin/ngen --info | grep -m 1 -e 'NumPy Version: ' | cut -d ':' -f 2 | uniq | xargs) \
-    'pydantic==2.7.4' \
     jupyterlab_vim \
     teehr==0.5.* \
+    pandera==0.29.0 \
     git-lfs==1.6 \
     #---------------------------------------------
     # 2i2c: Install GIS packages
