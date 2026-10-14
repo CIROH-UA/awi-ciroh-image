@@ -38,6 +38,13 @@ if __name__ == '__main__':
     if not result.wasSuccessful():
         failed = True
 
+    ''' Test cases for extern models (SUMMA, SAC-SMA, Snow17, LSTM, dHBV2) '''
+    for pattern in ('test_extern_models*.py', 'test_extern_realizations*.py'):
+        extern_tests = unittest.TestLoader().discover('.', pattern = pattern)
+        result = unittest.TextTestRunner(verbosity=1).run(extern_tests)
+        if not result.wasSuccessful():
+            failed = True
+
     ''' Test cases for TEEHR module (https://github.com/RTIInternational/teehr/)
     Note: TEEHR has its own test cases which are invoked from commandline
     Please see /tests/test-entrypoint.sh
