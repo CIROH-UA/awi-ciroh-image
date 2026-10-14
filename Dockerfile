@@ -344,6 +344,8 @@ RUN uv venv --system-site-packages \
     'netCDF4>=1.6.5' \
     numpy==$(/dmod/bin/ngen --info | grep -m 1 -e 'NumPy Version: ' | cut -d ':' -f 2 | uniq | xargs) \
     'pydantic<2' \
+    # pyarrow>=26 requires NumPy 2, which conflicts with the NumPy pinned above for ngen's routing module
+    'pyarrow==20.0.0' \
     #---------------------------------------------
     # Ngen: calibration ngen-cal
     #---------------------------------------------
