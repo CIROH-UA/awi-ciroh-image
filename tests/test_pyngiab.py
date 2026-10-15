@@ -5,9 +5,7 @@ from pyngiab import PyNGIAB
 
 class TestPyNGIAB(unittest.TestCase):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
+    def setUp(self):
         self._test_data = '/tests/cat-7080'
 
         ''' extract sample dataset '''
@@ -15,8 +13,6 @@ class TestPyNGIAB(unittest.TestCase):
         with zipfile.ZipFile(f'{self._test_data}.zip', 'r') as zip_ref:
             zip_ref.extractall('/tests/')
             pass
-
-        pass
 
     def test_pyngiab_serial(self):
         try:
@@ -38,7 +34,7 @@ class TestPyNGIAB(unittest.TestCase):
         self.assertEqual(run, True)
         pass
 
-    def __del__(self):
+    def tearDown(self):
         ''' Cleanup '''
         from pathlib import Path
         import shutil

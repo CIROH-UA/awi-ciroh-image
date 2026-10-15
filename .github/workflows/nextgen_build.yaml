@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - ngen-2i2c
+      - ngen-2i2c-update-with-cloudinfra-image
     tags:
       - 'v*'
   pull_request:
@@ -55,6 +56,12 @@ jobs:
             exit 0
           fi
 
+          # Pre-merge beta builds from the cloudinfra update branch
+          if [[ "${GITHUB_REF}" == "refs/heads/ngen-2i2c-update-with-cloudinfra-image" ]]; then
+            echo "value=ngen-2i2c-beta" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           # Branch push (refs/heads/ngen-2i2c → ngen-2i2c)
           if [[ "${GITHUB_REF}" == refs/heads/* ]]; then
             echo "value=${GITHUB_REF#refs/heads/}" >> "$GITHUB_OUTPUT"
@@ -70,10 +77,23 @@ jobs:
 
       - name: Free disk space
         run: |
+          # The image now bundles a Rust toolchain build, SUMMA/SUNDIALS/SAC-SMA/
+          # snow17, and dHBV2+PyTorch on top of the existing stack, so the
+          # runner's default ~14GB free disk isn't enough headroom for the
+          # multi-stage build cache plus the loaded final image (~19GB).
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf /usr/local/graalvm
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
           docker system prune -af
+          df -h /
 
       - name: Build and push
         uses: docker/build-push-action@v5
