@@ -79,7 +79,7 @@ RUN pip install nb_black==1.0.5
 #RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
 # HydroShare packages - install nbfetch, hsclient
-RUN pip install hsclient[all]==1.1.6 \
+RUN pip install hsclient[all]==1.1.9 \
 		pydantic==2.7.*
 
 RUN pip install -U --no-cache-dir --upgrade-strategy only-if-needed \
