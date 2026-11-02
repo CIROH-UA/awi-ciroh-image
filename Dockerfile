@@ -55,13 +55,14 @@ RUN pip install jupyterlab_vim
 # TO download the folder/files:
 RUN pip install jupyter-tree-download
 
-# Install Google Cloud SDK (gcloud, gsutil)
+# Install Google Cloud CLI (gcloud, gsutil)
 RUN apt-get update && \
-    apt-get install -y curl gnupg && \
-    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
+    apt-get install -y curl gnupg apt-transport-https ca-certificates && \
+    curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" > /etc/apt/sources.list.d/google-cloud-sdk.list && \
     apt-get update -y && \
-    apt-get install google-cloud-sdk -y
+    apt-get install -y google-cloud-cli && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install packages: spatialpandas, easydev, colormap, colorcet, duckdb, dask_geopandas, hydrotools, sidecar
 RUN pip install --no-cache-dir dask==2025.12.0 distributed==2025.12.0 spatialpandas easydev colormap colorcet duckdb dask_geopandas hydrotools sidecar
@@ -79,8 +80,7 @@ RUN pip install nb_black==1.0.5
 #RUN pip3 install numpy pandas xarray netcdf4 joblib toolz pyyaml Cython
 
 # HydroShare packages - install nbfetch, hsclient
-RUN pip install hsclient[all]==1.1.6 \
-		pydantic==2.7.*
+RUN pip install hsclient[all]==1.1.9
 
 RUN pip install -U --no-cache-dir --upgrade-strategy only-if-needed \
     git+https://github.com/hydroshare/nbfetch.git@v0.6.4 \
